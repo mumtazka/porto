@@ -29,9 +29,9 @@ export default function Hero() {
         <div className="absolute top-20 left-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-[100px] animate-pulse" />
         <div className="absolute bottom-20 right-1/4 w-80 h-80 bg-amber-500/10 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '1s' }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-[120px]" />
-        
+
         {/* Grid Pattern */}
-        <div 
+        <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
@@ -65,21 +65,21 @@ export default function Hero() {
 
             {/* Name */}
             <h1 className={`text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '200ms' }}>
-              <span className="text-white">Mumtaz</span>
+              <span className="text-gray-900">Mumtaz</span>
               <br />
-              <span className="text-white">Kholafiyan </span>
+              <span className="text-gray-900">Kholafiyan </span>
               <span className="text-cyan-400">Alfan</span>
             </h1>
 
             {/* Title */}
             <div className={`flex items-center gap-3 mb-6 transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '400ms' }}>
               <div className="h-px flex-1 bg-gradient-to-r from-orange-500 to-transparent" />
-              <span className="text-xl sm:text-2xl text-gray-300 font-light">Full Stack Developer</span>
+              <span className="text-xl sm:text-2xl text-gray-900 font-light">Full Stack Developer</span>
               <div className="h-px flex-1 bg-gradient-to-l from-orange-500 to-transparent" />
             </div>
 
             {/* Description with Typing Effect */}
-            <p className={`text-gray-400 text-lg leading-relaxed mb-8 min-h-[80px] transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '600ms' }}>
+            <p className={`text-gray-600 text-lg leading-relaxed mb-8 min-h-[80px] transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '600ms' }}>
               {displayedText}
               {!isComplete && (
                 <span className="inline-block w-0.5 h-5 bg-orange-500 ml-1 animate-blink" />
@@ -88,7 +88,7 @@ export default function Hero() {
 
             {/* CTA Buttons */}
             <div className={`flex flex-wrap gap-4 mb-10 transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '800ms' }}>
-              <button 
+              <button
                 onClick={scrollToProjects}
                 className="group btn-primary flex items-center gap-2"
               >
@@ -102,7 +102,7 @@ export default function Hero() {
             </div>
 
             {/* Location Badge */}
-            <div className={`flex items-center gap-2 text-gray-400 transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '1000ms' }}>
+            <div className={`flex items-center gap-2 text-gray-600 transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '1000ms' }}>
               <MapPin className="w-4 h-4 text-orange-500" />
               <span className="text-sm">Based in Yogyakarta, Indonesia</span>
             </div>
@@ -115,7 +115,7 @@ export default function Hero() {
               <div className="relative w-72 h-72 sm:w-80 sm:h-80 lg:w-96 lg:h-96">
                 {/* Glow Effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-500/30 to-amber-500/30 rounded-3xl blur-2xl animate-pulse" />
-                
+
                 {/* Glass Card */}
                 <div className="relative w-full h-full glass-strong rounded-3xl overflow-hidden animate-float">
                   {/* Placeholder for Profile Image */}
@@ -124,10 +124,10 @@ export default function Hero() {
                       <div className="w-32 h-32 mx-auto mb-4 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-glow-strong">
                         <span className="text-5xl font-bold text-white">M</span>
                       </div>
-                      <p className="text-gray-400 text-sm">Full Stack Developer</p>
+                      <p className="text-gray-500 text-sm">Full Stack Developer</p>
                     </div>
                   </div>
-                  
+
                   {/* Border Gradient */}
                   <div className="absolute inset-0 rounded-3xl border-2 border-gradient opacity-50" />
                 </div>

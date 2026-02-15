@@ -47,18 +47,16 @@ function TechCard({ tech, index }: { tech: TechItem; index: number }) {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`relative group px-6 py-4 glass rounded-xl cursor-pointer transition-all duration-300 ${
-          isHovered ? 'scale-110 glow-orange' : ''
-        }`}
+        className={`relative group px-6 py-4 glass rounded-xl cursor-pointer transition-all duration-300 ${isHovered ? 'scale-110 glow-orange' : ''
+          }`}
         style={{
           animationDelay: `${index * 100}ms`,
         }}
       >
         {/* Glow Effect on Hover */}
         <div
-          className={`absolute inset-0 rounded-xl transition-opacity duration-300 ${
-            isHovered ? 'opacity-100' : 'opacity-0'
-          }`}
+          className={`absolute inset-0 rounded-xl transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'
+            }`}
           style={{
             background: `radial-gradient(circle at center, ${tech.color}20 0%, transparent 70%)`,
           }}
@@ -68,14 +66,13 @@ function TechCard({ tech, index }: { tech: TechItem; index: number }) {
           <span className="text-2xl" style={{ filter: isHovered ? `drop-shadow(0 0 8px ${tech.color})` : 'none' }}>
             {tech.icon}
           </span>
-          <span className="text-white font-medium whitespace-nowrap">{tech.name}</span>
+          <span className="text-gray-900 font-medium whitespace-nowrap">{tech.name}</span>
         </div>
 
         {/* Border Glow */}
         <div
-          className={`absolute inset-0 rounded-xl border transition-all duration-300 pointer-events-none ${
-            isHovered ? 'border-orange-500/50' : 'border-transparent'
-          }`}
+          className={`absolute inset-0 rounded-xl border transition-all duration-300 pointer-events-none ${isHovered ? 'border-orange-500/50' : 'border-transparent'
+            }`}
         />
       </div>
     </div>
@@ -128,10 +125,10 @@ export default function TechCarousel() {
           <span className="inline-block px-4 py-2 glass rounded-full text-orange-400 text-sm font-medium mb-4">
             My Arsenal
           </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
             Tech Stack & <span className="text-gradient">Tools</span>
           </h2>
-          <p className="text-gray-400 max-w-2xl mx-auto">
+          <p className="text-gray-600 max-w-2xl mx-auto">
             Technologies I use to bring ideas to life. Always learning and exploring new tools.
           </p>
         </div>
@@ -180,22 +177,22 @@ export default function TechCarousel() {
         <div className={`flex flex-wrap justify-center gap-8 mt-16 px-4 transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="text-center">
             <div className="text-4xl font-bold text-gradient mb-1">5+</div>
-            <div className="text-gray-400 text-sm">Years Experience</div>
+            <div className="text-gray-600 text-sm">Years Experience</div>
           </div>
           <div className="w-px h-16 bg-gray-700 hidden sm:block" />
           <div className="text-center">
             <div className="text-4xl font-bold text-gradient mb-1">50+</div>
-            <div className="text-gray-400 text-sm">Projects Completed</div>
+            <div className="text-gray-600 text-sm">Projects Completed</div>
           </div>
           <div className="w-px h-16 bg-gray-700 hidden sm:block" />
           <div className="text-center">
             <div className="text-4xl font-bold text-gradient mb-1">20+</div>
-            <div className="text-gray-400 text-sm">Technologies</div>
+            <div className="text-gray-600 text-sm">Technologies</div>
           </div>
           <div className="w-px h-16 bg-gray-700 hidden sm:block" />
           <div className="text-center">
             <div className="text-4xl font-bold text-gradient mb-1">30+</div>
-            <div className="text-gray-400 text-sm">Happy Clients</div>
+            <div className="text-gray-600 text-sm">Happy Clients</div>
           </div>
         </div>
       </div>

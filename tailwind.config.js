@@ -40,9 +40,9 @@ module.exports = {
         },
         // Custom colors
         charcoal: {
-          DEFAULT: '#1A1A1A',
-          light: '#2D2D2D',
-          dark: '#0F0F0F',
+          DEFAULT: '#ffffff',
+          light: '#f3f4f6',
+          dark: '#e5e7eb',
         },
         orange: {
           DEFAULT: '#F97316',

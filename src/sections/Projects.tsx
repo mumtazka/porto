@@ -14,17 +14,17 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div 
+      <div
         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
         onClick={onClose}
       />
-      
+
       {/* Modal Content */}
       <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto glass-strong rounded-2xl animate-scale-in">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 glass rounded-full text-white hover:bg-orange-500 transition-colors z-10"
+          className="absolute top-4 right-4 p-2 glass rounded-full text-gray-900 hover:bg-orange-500 transition-colors z-10"
         >
           <X className="w-5 h-5" />
         </button>
@@ -41,17 +41,17 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
 
         {/* Project Details */}
         <div className="p-6 sm:p-8">
-          <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+          <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
             {project.title}
           </h3>
-          
-          <p className="text-gray-300 leading-relaxed mb-6">
+
+          <p className="text-gray-700 leading-relaxed mb-6">
             {project.description}
           </p>
 
           {/* Tech Stack */}
           <div className="mb-8">
-            <h4 className="text-sm font-medium text-gray-400 mb-3">Technologies Used</h4>
+            <h4 className="text-sm font-medium text-gray-600 mb-3">Technologies Used</h4>
             <div className="flex flex-wrap gap-2">
               {project.tech_stack.map((tech) => (
                 <span
@@ -123,9 +123,8 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
     <>
       <div
         ref={cardRef}
-        className={`group relative transition-all duration-700 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-        }`}
+        className={`group relative transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+          }`}
         style={{ transitionDelay: `${index * 150}ms` }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -138,15 +137,13 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             <img
               src={project.image_url}
               alt={project.title}
-              className={`w-full h-full object-cover transition-transform duration-500 ${
-                isHovered ? 'scale-110' : 'scale-100'
-              }`}
+              className={`w-full h-full object-cover transition-transform duration-500 ${isHovered ? 'scale-110' : 'scale-100'
+                }`}
             />
-            
+
             {/* Overlay */}
-            <div className={`absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/80 to-transparent transition-opacity duration-300 ${
-              isHovered ? 'opacity-90' : 'opacity-60'
-            }`} />
+            <div className={`absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent transition-opacity duration-300 ${isHovered ? 'opacity-90' : 'opacity-60'
+              }`} />
 
             {/* Featured Badge */}
             {project.featured && (
@@ -156,14 +153,13 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             )}
 
             {/* Hover Content */}
-            <div className={`absolute inset-0 flex flex-col justify-end p-6 transition-all duration-300 ${
-              isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}>
+            <div className={`absolute inset-0 flex flex-col justify-end p-6 transition-all duration-300 ${isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+              }`}>
               <h3 className="text-xl font-bold text-white mb-2">{project.title}</h3>
               <p className="text-gray-300 text-sm line-clamp-2 mb-4">
                 {project.description}
               </p>
-              
+
               {/* Tech Stack */}
               <div className="flex flex-wrap gap-2 mb-4">
                 {project.tech_stack.slice(0, 4).map((tech) => (
@@ -191,7 +187,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 
           {/* Bottom Info (Visible when not hovered) */}
           <div className={`p-4 transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
-            <h3 className="text-lg font-semibold text-white mb-1">{project.title}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">{project.title}</h3>
             <div className="flex flex-wrap gap-2">
               {project.tech_stack.slice(0, 3).map((tech) => (
                 <span
@@ -205,9 +201,8 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           </div>
 
           {/* Border Glow */}
-          <div className={`absolute inset-0 rounded-2xl border-2 transition-all duration-300 pointer-events-none ${
-            isHovered ? 'border-orange-500/50 glow-orange' : 'border-transparent'
-          }`} />
+          <div className={`absolute inset-0 rounded-2xl border-2 transition-all duration-300 pointer-events-none ${isHovered ? 'border-orange-500/50 glow-orange' : 'border-transparent'
+            }`} />
         </div>
       </div>
 
@@ -262,12 +257,12 @@ export default function Projects() {
           <span className="inline-block px-4 py-2 glass rounded-full text-orange-400 text-sm font-medium mb-4">
             Portfolio
           </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
             Featured <span className="text-gradient">Work</span>
           </h2>
           <div className="flex items-center justify-center gap-4">
             <div className="h-px w-12 bg-gradient-to-r from-transparent to-orange-500" />
-            <p className="text-gray-400 max-w-xl">
+            <p className="text-gray-600 max-w-xl">
               A selection of projects I've worked on. Each one represents a unique challenge and creative solution.
             </p>
             <div className="h-px w-12 bg-gradient-to-l from-transparent to-orange-500" />
@@ -292,7 +287,7 @@ export default function Projects() {
         {/* Featured Projects */}
         {!loading && featuredProjects.length > 0 && (
           <div className="mb-12">
-            <h3 className="text-lg font-medium text-gray-400 mb-6 flex items-center gap-2">
+            <h3 className="text-lg font-medium text-gray-600 mb-6 flex items-center gap-2">
               <span className="w-2 h-2 bg-orange-500 rounded-full" />
               Featured Projects
             </h3>
@@ -307,7 +302,7 @@ export default function Projects() {
         {/* Other Projects */}
         {!loading && otherProjects.length > 0 && (
           <div>
-            <h3 className="text-lg font-medium text-gray-400 mb-6 flex items-center gap-2">
+            <h3 className="text-lg font-medium text-gray-600 mb-6 flex items-center gap-2">
               <span className="w-2 h-2 bg-cyan-500 rounded-full" />
               More Projects
             </h3>
@@ -326,7 +321,7 @@ export default function Projects() {
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 glass rounded-xl text-white hover:bg-orange-500/20 transition-all duration-300 group"
+              className="inline-flex items-center gap-2 px-6 py-3 glass rounded-xl text-gray-900 hover:bg-orange-500/20 transition-all duration-300 group"
             >
               <Github className="w-5 h-5" />
               View All on GitHub

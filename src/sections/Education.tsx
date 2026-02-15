@@ -33,9 +33,8 @@ function EducationCard({ edu, index, isLeft }: { edu: any; index: number; isLeft
   return (
     <div
       ref={cardRef}
-      className={`relative flex items-center justify-center transition-all duration-700 ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-      }`}
+      className={`relative flex items-center justify-center transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+        }`}
       style={{ transitionDelay: `${index * 200}ms` }}
     >
       {/* Desktop Layout */}
@@ -43,22 +42,22 @@ function EducationCard({ edu, index, isLeft }: { edu: any; index: number; isLeft
         {/* Left Side */}
         <div className={`${isLeft ? 'text-right' : 'order-3 text-left'}`}>
           {isLeft && (
-            <div 
+            <div
               className="glass rounded-2xl p-6 card-hover cursor-pointer"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
               <div className="flex items-start gap-4 justify-end">
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-white mb-1">{edu.institution}</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">{edu.institution}</h3>
                   <p className="text-orange-400 font-medium mb-2">{edu.degree}</p>
-                  <p className="text-gray-400 text-sm mb-3">{edu.field}</p>
+                  <p className="text-gray-600 text-sm mb-3">{edu.field}</p>
                   <div className="flex items-center gap-2 text-gray-500 text-sm justify-end">
                     <Calendar className="w-4 h-4" />
                     {formatDate(edu.start_date)} - {formatDate(edu.end_date)}
                   </div>
                   {edu.description && (
-                    <p className="text-gray-400 text-sm mt-3 line-clamp-2">{edu.description}</p>
+                    <p className="text-gray-600 text-sm mt-3 line-clamp-2">{edu.description}</p>
                   )}
                 </div>
                 <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 glass">
@@ -69,11 +68,10 @@ function EducationCard({ edu, index, isLeft }: { edu: any; index: number; isLeft
                   />
                 </div>
               </div>
-              
+
               {/* Border Glow */}
-              <div className={`absolute inset-0 rounded-2xl border-2 transition-all duration-300 pointer-events-none ${
-                isHovered ? 'border-orange-500/50 glow-orange' : 'border-transparent'
-              }`} />
+              <div className={`absolute inset-0 rounded-2xl border-2 transition-all duration-300 pointer-events-none ${isHovered ? 'border-orange-500/50 glow-orange' : 'border-transparent'
+                }`} />
             </div>
           )}
         </div>
@@ -87,7 +85,7 @@ function EducationCard({ edu, index, isLeft }: { edu: any; index: number; isLeft
         {/* Right Side */}
         <div className={`${!isLeft ? 'text-left' : 'order-1 text-right'}`}>
           {!isLeft && (
-            <div 
+            <div
               className="relative glass rounded-2xl p-6 card-hover cursor-pointer"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
@@ -101,23 +99,22 @@ function EducationCard({ edu, index, isLeft }: { edu: any; index: number; isLeft
                   />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-white mb-1">{edu.institution}</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">{edu.institution}</h3>
                   <p className="text-orange-400 font-medium mb-2">{edu.degree}</p>
-                  <p className="text-gray-400 text-sm mb-3">{edu.field}</p>
+                  <p className="text-gray-600 text-sm mb-3">{edu.field}</p>
                   <div className="flex items-center gap-2 text-gray-500 text-sm">
                     <Calendar className="w-4 h-4" />
                     {formatDate(edu.start_date)} - {formatDate(edu.end_date)}
                   </div>
                   {edu.description && (
-                    <p className="text-gray-400 text-sm mt-3 line-clamp-2">{edu.description}</p>
+                    <p className="text-gray-600 text-sm mt-3 line-clamp-2">{edu.description}</p>
                   )}
                 </div>
               </div>
 
               {/* Border Glow */}
-              <div className={`absolute inset-0 rounded-2xl border-2 transition-all duration-300 pointer-events-none ${
-                isHovered ? 'border-orange-500/50 glow-orange' : 'border-transparent'
-              }`} />
+              <div className={`absolute inset-0 rounded-2xl border-2 transition-all duration-300 pointer-events-none ${isHovered ? 'border-orange-500/50 glow-orange' : 'border-transparent'
+                }`} />
             </div>
           )}
         </div>
@@ -125,7 +122,7 @@ function EducationCard({ edu, index, isLeft }: { edu: any; index: number; isLeft
 
       {/* Mobile/Tablet Layout */}
       <div className="lg:hidden w-full">
-        <div 
+        <div
           className="relative glass rounded-2xl p-5 card-hover"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
@@ -147,7 +144,7 @@ function EducationCard({ edu, index, isLeft }: { edu: any; index: number; isLeft
                   />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">{edu.institution}</h3>
+                  <h3 className="text-lg font-bold text-gray-900">{edu.institution}</h3>
                   <div className="flex items-center gap-2 text-gray-500 text-xs mt-1">
                     <Calendar className="w-3 h-3" />
                     {formatDate(edu.start_date)} - {formatDate(edu.end_date)}
@@ -156,8 +153,8 @@ function EducationCard({ edu, index, isLeft }: { edu: any; index: number; isLeft
               </div>
 
               <p className="text-orange-400 font-medium mb-1">{edu.degree}</p>
-              <p className="text-gray-400 text-sm mb-2">{edu.field}</p>
-              
+              <p className="text-gray-600 text-sm mb-2">{edu.field}</p>
+
               {edu.description && (
                 <p className="text-gray-500 text-sm line-clamp-2">{edu.description}</p>
               )}
@@ -165,9 +162,8 @@ function EducationCard({ edu, index, isLeft }: { edu: any; index: number; isLeft
           </div>
 
           {/* Border Glow */}
-          <div className={`absolute inset-0 rounded-2xl border-2 transition-all duration-300 pointer-events-none ${
-            isHovered ? 'border-orange-500/50 glow-orange' : 'border-transparent'
-          }`} />
+          <div className={`absolute inset-0 rounded-2xl border-2 transition-all duration-300 pointer-events-none ${isHovered ? 'border-orange-500/50 glow-orange' : 'border-transparent'
+            }`} />
         </div>
       </div>
     </div>
@@ -215,12 +211,12 @@ export default function Education() {
             <GraduationCap className="w-4 h-4 inline mr-2" />
             Learning Journey
           </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
             Education & <span className="text-gradient">Achievements</span>
           </h2>
           <div className="flex items-center justify-center gap-4">
             <div className="h-px w-12 bg-gradient-to-r from-transparent to-orange-500" />
-            <p className="text-gray-400 max-w-xl">
+            <p className="text-gray-600 max-w-xl">
               My academic background and professional certifications that shaped my expertise.
             </p>
             <div className="h-px w-12 bg-gradient-to-l from-transparent to-orange-500" />
@@ -267,8 +263,8 @@ export default function Education() {
                 <Award className="w-6 h-6 text-white" />
               </div>
               <div className="text-left">
-                <h4 className="text-white font-semibold">View All Certifications</h4>
-                <p className="text-gray-400 text-sm">Check out my complete credential portfolio</p>
+                <h4 className="text-gray-900 font-semibold">View All Certifications</h4>
+                <p className="text-gray-600 text-sm">Check out my complete credential portfolio</p>
               </div>
               <a
                 href="https://linkedin.com"

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Sidebar from './components/Sidebar';
+
 import AIChatbot from './components/AIChatbot';
 import Hero from './sections/Hero';
 import TechCarousel from './sections/TechCarousel';
@@ -11,8 +11,7 @@ import Admin from './pages/Admin';
 function HomePage() {
   return (
     <>
-      <Sidebar />
-      <main className="lg:ml-0">
+      <main className="w-full">
         <Hero />
         <TechCarousel />
         <Projects />
