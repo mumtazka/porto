@@ -22,7 +22,7 @@ export const supabase = {
   }),
   auth: {
     getSession: () => Promise.resolve({ data: { session: null } }),
-    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
     signInWithPassword: () => Promise.resolve({ data: null, error: null }),
     signOut: () => Promise.resolve({ error: null }),
   },
@@ -141,6 +141,39 @@ export const mockEducation = [
     end_date: '2022-12-01',
     certificate_image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=300&fit=crop',
     description: 'Advanced React patterns, state management, and modern front-end architecture. Component design and performance optimization.',
+    created_at: new Date().toISOString(),
+  },
+];
+
+export const mockAchievements = [
+  {
+    id: '1',
+    title: 'Google Cloud Professional Architect',
+    issuer: 'Google Cloud',
+    date: '2023-03-01',
+    description: 'Certified in designing, developing, and managing cloud solutions on Google Cloud Platform.',
+    credential_url: 'https://cloud.google.com/certification',
+    image_url: 'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=400&h=300&fit=crop',
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: '2',
+    title: 'AWS Solutions Architect Associate',
+    issuer: 'Amazon Web Services',
+    date: '2023-08-01',
+    description: 'Proficient in designing distributed systems on AWS infrastructure.',
+    credential_url: 'https://aws.amazon.com/certification',
+    image_url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=300&fit=crop',
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: '3',
+    title: 'Meta Front-End Developer',
+    issuer: 'Meta',
+    date: '2022-12-01',
+    description: 'Advanced React patterns, state management, and modern front-end architecture.',
+    credential_url: 'https://www.coursera.org',
+    image_url: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=300&fit=crop',
     created_at: new Date().toISOString(),
   },
 ];

@@ -94,6 +94,38 @@ export interface Database {
           created_at?: string;
         };
       };
+      achievements: {
+        Row: {
+          id: string;
+          title: string;
+          issuer: string;
+          date: string;
+          description: string | null;
+          credential_url: string | null;
+          image_url: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          issuer: string;
+          date: string;
+          description?: string | null;
+          credential_url?: string | null;
+          image_url?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          issuer?: string;
+          date?: string;
+          description?: string | null;
+          credential_url?: string | null;
+          image_url?: string | null;
+          created_at?: string;
+        };
+      };
     };
   };
 }
@@ -101,3 +133,4 @@ export interface Database {
 export type Project = Database['public']['Tables']['projects']['Row'];
 export type Education = Database['public']['Tables']['education']['Row'];
 export type Message = Database['public']['Tables']['messages']['Row'];
+export type Achievement = Database['public']['Tables']['achievements']['Row'];

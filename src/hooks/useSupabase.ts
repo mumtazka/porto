@@ -1,6 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase, mockProjects, mockEducation, isSupabaseConfigured } from '../utils/supabaseClient';
-import type { Project, Education, Message } from '../types/database';
+import { mockProjects, mockEducation, mockAchievements, isSupabaseConfigured } from '../utils/supabaseClient';
+import type { Project, Education, Message, Achievement } from '../types/database';
+
+// Helper: load from localStorage or fallback
+function loadFromStorage<T>(key: string, fallback: T[]): T[] {
+  try {
+    const stored = localStorage.getItem(key);
+    if (stored) return JSON.parse(stored);
+  } catch { }
+  return fallback;
+}
+
+function saveToStorage<T>(key: string, data: T[]) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
 
 // Projects Hook
 export const useProjects = () => {
@@ -10,23 +23,13 @@ export const useProjects = () => {
   const fetchProjects = useCallback(async () => {
     try {
       setLoading(true);
-      
       if (!isSupabaseConfigured()) {
-        // Use mock data when Supabase is not configured
-        setProjects(mockProjects);
+        setProjects(loadFromStorage('portfolio_projects', mockProjects));
         setLoading(false);
         return;
       }
-
-      // When Supabase is configured, use this:
-      // const { data, error } = await supabase
-      //   .from('projects')
-      //   .select('*')
-      //   .order('created_at', { ascending: false });
-      // if (error) throw error;
-      // setProjects(data || []);
-    } catch (err) {
-      setProjects(mockProjects);
+    } catch {
+      setProjects(loadFromStorage('portfolio_projects', mockProjects));
     } finally {
       setLoading(false);
     }
@@ -35,6 +38,13 @@ export const useProjects = () => {
   useEffect(() => {
     fetchProjects();
   }, [fetchProjects]);
+
+  // Persist whenever projects change
+  useEffect(() => {
+    if (projects.length > 0) {
+      saveToStorage('portfolio_projects', projects);
+    }
+  }, [projects]);
 
   const addProject = async (project: Omit<Project, 'id' | 'created_at'>) => {
     if (!isSupabaseConfigured()) {
@@ -46,8 +56,6 @@ export const useProjects = () => {
       setProjects(prev => [newProject, ...prev]);
       return { data: newProject, error: null };
     }
-
-    // Supabase implementation when configured
     return { data: null, error: null };
   };
 
@@ -56,16 +64,18 @@ export const useProjects = () => {
       setProjects(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
       return { error: null };
     }
-
     return { error: null };
   };
 
   const deleteProject = async (id: string) => {
     if (!isSupabaseConfigured()) {
-      setProjects(prev => prev.filter(p => p.id !== id));
+      setProjects(prev => {
+        const updated = prev.filter(p => p.id !== id);
+        saveToStorage('portfolio_projects', updated);
+        return updated;
+      });
       return { error: null };
     }
-
     return { error: null };
   };
 
@@ -80,16 +90,13 @@ export const useEducation = () => {
   const fetchEducation = useCallback(async () => {
     try {
       setLoading(true);
-      
       if (!isSupabaseConfigured()) {
-        setEducation(mockEducation);
+        setEducation(loadFromStorage('portfolio_education', mockEducation));
         setLoading(false);
         return;
       }
-
-      // Supabase implementation when configured
-    } catch (err) {
-      setEducation(mockEducation);
+    } catch {
+      setEducation(loadFromStorage('portfolio_education', mockEducation));
     } finally {
       setLoading(false);
     }
@@ -98,6 +105,12 @@ export const useEducation = () => {
   useEffect(() => {
     fetchEducation();
   }, [fetchEducation]);
+
+  useEffect(() => {
+    if (education.length > 0) {
+      saveToStorage('portfolio_education', education);
+    }
+  }, [education]);
 
   const addEducation = async (edu: Omit<Education, 'id' | 'created_at'>) => {
     if (!isSupabaseConfigured()) {
@@ -109,7 +122,6 @@ export const useEducation = () => {
       setEducation(prev => [newEdu, ...prev]);
       return { data: newEdu, error: null };
     }
-
     return { data: null, error: null };
   };
 
@@ -118,20 +130,88 @@ export const useEducation = () => {
       setEducation(prev => prev.map(e => e.id === id ? { ...e, ...updates } : e));
       return { error: null };
     }
-
     return { error: null };
   };
 
   const deleteEducation = async (id: string) => {
     if (!isSupabaseConfigured()) {
-      setEducation(prev => prev.filter(e => e.id !== id));
+      setEducation(prev => {
+        const updated = prev.filter(e => e.id !== id);
+        saveToStorage('portfolio_education', updated);
+        return updated;
+      });
       return { error: null };
     }
-
     return { error: null };
   };
 
   return { education, loading, addEducation, updateEducation, deleteEducation, refetch: fetchEducation };
+};
+
+// Achievements Hook
+export const useAchievements = () => {
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchAchievements = useCallback(async () => {
+    try {
+      setLoading(true);
+      if (!isSupabaseConfigured()) {
+        setAchievements(loadFromStorage('portfolio_achievements', mockAchievements));
+        setLoading(false);
+        return;
+      }
+    } catch {
+      setAchievements(loadFromStorage('portfolio_achievements', mockAchievements));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAchievements();
+  }, [fetchAchievements]);
+
+  useEffect(() => {
+    if (achievements.length > 0) {
+      saveToStorage('portfolio_achievements', achievements);
+    }
+  }, [achievements]);
+
+  const addAchievement = async (achievement: Omit<Achievement, 'id' | 'created_at'>) => {
+    if (!isSupabaseConfigured()) {
+      const newAchievement = {
+        ...achievement,
+        id: Math.random().toString(36).substr(2, 9),
+        created_at: new Date().toISOString(),
+      };
+      setAchievements(prev => [newAchievement, ...prev]);
+      return { data: newAchievement, error: null };
+    }
+    return { data: null, error: null };
+  };
+
+  const updateAchievement = async (id: string, updates: Partial<Achievement>) => {
+    if (!isSupabaseConfigured()) {
+      setAchievements(prev => prev.map(a => a.id === id ? { ...a, ...updates } : a));
+      return { error: null };
+    }
+    return { error: null };
+  };
+
+  const deleteAchievement = async (id: string) => {
+    if (!isSupabaseConfigured()) {
+      setAchievements(prev => {
+        const updated = prev.filter(a => a.id !== id);
+        saveToStorage('portfolio_achievements', updated);
+        return updated;
+      });
+      return { error: null };
+    }
+    return { error: null };
+  };
+
+  return { achievements, loading, addAchievement, updateAchievement, deleteAchievement, refetch: fetchAchievements };
 };
 
 // Messages Hook
@@ -142,13 +222,17 @@ export const useMessages = () => {
   const sendMessage = async (message: Omit<Message, 'id' | 'created_at'>) => {
     try {
       setLoading(true);
-      
       if (!isSupabaseConfigured()) {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        const newMessage = {
+          ...message,
+          id: Math.random().toString(36).substr(2, 9),
+          created_at: new Date().toISOString(),
+        };
+        const stored = loadFromStorage<Message>('portfolio_messages', []);
+        const updated = [newMessage, ...stored];
+        saveToStorage('portfolio_messages', updated);
         return { success: true, error: null };
       }
-
       return { success: true, error: null };
     } catch (err) {
       return { success: false, error: err };
@@ -159,12 +243,24 @@ export const useMessages = () => {
 
   const fetchMessages = useCallback(async () => {
     if (!isSupabaseConfigured()) {
-      setMessages([]);
+      setMessages(loadFromStorage('portfolio_messages', []));
       return;
     }
   }, []);
 
-  return { messages, loading, sendMessage, fetchMessages };
+  const deleteMessage = async (id: string) => {
+    if (!isSupabaseConfigured()) {
+      setMessages(prev => {
+        const updated = prev.filter(m => m.id !== id);
+        saveToStorage('portfolio_messages', updated);
+        return updated;
+      });
+      return { error: null };
+    }
+    return { error: null };
+  };
+
+  return { messages, loading, sendMessage, fetchMessages, deleteMessage };
 };
 
 // Auth Hook
@@ -174,28 +270,33 @@ export const useAuth = () => {
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
+      // Check localStorage for persisted session
+      const storedUser = localStorage.getItem('portfolio_admin_user');
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
       setLoading(false);
       return;
     }
-
     setLoading(false);
   }, []);
 
   const signIn = async (email: string, password: string) => {
     if (!isSupabaseConfigured()) {
-      // Mock login for demo
       if (email === 'admin@example.com' && password === 'admin') {
-        setUser({ email });
-        return { data: { user: { email } }, error: null };
+        const userData = { email };
+        setUser(userData);
+        localStorage.setItem('portfolio_admin_user', JSON.stringify(userData));
+        return { data: { user: userData }, error: null };
       }
       return { error: { message: 'Invalid credentials' } };
     }
-
     return { data: null, error: null };
   };
 
   const signOut = async () => {
     setUser(null);
+    localStorage.removeItem('portfolio_admin_user');
     return { error: null };
   };
 
