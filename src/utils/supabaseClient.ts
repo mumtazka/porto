@@ -1,32 +1,44 @@
-// Supabase client configuration
-// To enable Supabase, install: npm install @supabase/supabase-js
-// and set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables
+import { createClient } from '@supabase/supabase-js';
 
-// import { createClient } from '@supabase/supabase-js';
-// import type { Database } from '../types/database';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-// const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const isConfigured = supabaseUrl && supabaseUrl.startsWith('http') && supabaseAnonKey;
 
-// export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+if (!isConfigured) {
+  console.warn(
+    'Supabase environment variables are missing or invalid. The app will run in read-only/demo mode with mock data where possible.'
+  );
+}
 
-// Mock supabase client for development
-export const supabase = {
-  from: () => ({
-    select: () => ({ data: null, error: null }),
-    insert: () => ({ data: null, error: null }),
-    update: () => ({ data: null, error: null }),
-    delete: () => ({ data: null, error: null }),
-    eq: () => ({ data: null, error: null }),
-    order: () => ({ data: null, error: null }),
-  }),
-  auth: {
-    getSession: () => Promise.resolve({ data: { session: null } }),
-    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
-    signInWithPassword: () => Promise.resolve({ data: null, error: null }),
-    signOut: () => Promise.resolve({ error: null }),
-  },
-};
+export const supabase = isConfigured
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : {
+    from: (table: string) => ({
+      select: () => ({
+        order: () => Promise.resolve({ data: [], error: null }),
+        eq: () => Promise.resolve({ data: [], error: null }),
+        single: () => Promise.resolve({ data: null, error: null }),
+        limit: () => Promise.resolve({ data: [], error: null }),
+        then: (resolve: any) => resolve({ data: [], error: null }), // Make it thenable
+      }),
+      insert: () => Promise.resolve({ data: null, error: null }),
+      update: () => Promise.resolve({ data: null, error: null }),
+      delete: () => Promise.resolve({ data: null, error: null }),
+    }),
+    auth: {
+      getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
+      signInWithPassword: () => Promise.resolve({ data: null, error: null }),
+      signOut: () => Promise.resolve({ error: null }),
+    },
+    storage: {
+      from: () => ({
+        getPublicUrl: () => ({ data: { publicUrl: '' } }),
+        upload: () => Promise.resolve({ data: null, error: null }),
+      })
+    }
+  } as any;
 
 // Mock data for development (when Supabase is not configured)
 export const mockProjects = [

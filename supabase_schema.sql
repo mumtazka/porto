@@ -1,0 +1,35 @@
+-- Create a table for the tech stack
+create table if not exists tech_stack (
+  id bigint primary key generated always as identity,
+  name text not null,
+  color text not null,
+  path text not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable Row Level Security (RLS)
+alter table tech_stack enable row level security;
+
+-- Create a policy to allow read access to everyone
+create policy "Public Tech Stack Read Access"
+  on tech_stack for select
+  using ( true );
+
+-- Create a policy to allow insert/update/delete access to authenticated users only (optional, for admin)
+create policy "Authenticated Tech Stack Access"
+  on tech_stack for all
+  using ( auth.role() = 'authenticated' );
+
+-- Seed the table with the current data
+insert into tech_stack (name, color, path) values
+  ('Linux', '#FCC624', 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z M12 6c-1.5 0-3 1-3 3 0 2 1.5 3 3 3s3-1 3-3c0-2-1.5-3-3-3zm0 12c-2.5 0-5-1.5-5-4 0-1.5 1-2.5 2-2.5h6c1 0 2 1 2 2.5 0 2.5-2.5 4-5 4z'),
+  ('Vite', '#646CFF', 'M13 2L3 14h9l-1 8 10-12h-9l1-8z'),
+  ('React', '#61DAFB', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm0-10a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-6 2c0 2.2 2.7 4 6 4s6-1.8 6-4-2.7-4-6-4-6 1.8-6 4z'),
+  ('Tailwind', '#06B6D4', 'M4 12c0-2 2-2 4 0s2 4 4 4 2-2 4-4 2-4 4-2 M4 6c0-2 2-2 4 0s2 4 4 4 2-2 4-4 2-4 4-2'),
+  ('Supabase', '#3ECF8E', 'M12 2L4 12h8l-2 10 10-10h-8l2-10z'),
+  ('Git', '#F05032', 'M16 12h-2v-4h-2c-1.1 0-2 .9-2 2v5l-3-3-1.4 1.4 5.4 5.4 5.4-5.4-1.4-1.4-3 3V12z M7 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm10 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z'),
+  ('Node.js', '#339933', 'M12 2l9 5v10l-9 5-9-5V7l9-5z M12 11c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-2.3 0-4.6.6-6 1.7V17h12v-2.3c-1.4-1.1-3.7-1.7-6-1.7z'),
+  ('GitHub', '#181717', 'M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-1.98 1.02-2.68-.1-.28-.45-1.29.1-2.68 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.39.2 2.4.1 2.68.64.7 1.02 1.57 1.02 2.68 0 3.83-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.17 22 16.42 22 12A10 10 0 0 0 12 2z'),
+  ('Netlify', '#00C7B7', 'M4 4l6 10-6 6-4-10 4-6zm16 0l-6 10 6 6 4-10-4-6zm-8 16l-6-10h12l-6 10z'),
+  ('Google Console', '#4285F4', 'M12 2L3 7v10l9 5 9-5V7l-9-5zm0 2.5l6.5 3.6v7.8L12 19.5 5.5 15.9V8.1L12 4.5zM8 11h8M8 14h5'),
+  ('Cloudflare', '#F38020', 'M18 10h-1.26A5.002 5.002 0 0 0 8 10c0 .17.02.34.05.5a3 3 0 0 0-2.05 5.46L6 16h12a4 4 0 0 0 0-8z');

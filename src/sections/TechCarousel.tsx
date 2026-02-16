@@ -1,87 +1,23 @@
 import { useRef, useEffect, useState } from 'react';
+import { supabase } from '../utils/supabaseClient';
 
 interface TechItem {
+  id: number;
   name: string;
-  // Color kept for hover effects or future use, but icons will be gray outlines by default
   color: string;
   path: string;
 }
 
-const techStack: TechItem[] = [
-  {
-    name: 'Linux',
-    color: '#FCC624',
-    // Outline Tuxish
-    path: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z M12 6c-1.5 0-3 1-3 3 0 2 1.5 3 3 3s3-1 3-3c0-2-1.5-3-3-3zm0 12c-2.5 0-5-1.5-5-4 0-1.5 1-2.5 2-2.5h6c1 0 2 1 2 2.5 0 2.5-2.5 4-5 4z"
-  },
-  {
-    name: 'Vite',
-    color: '#646CFF',
-    // Lightning Bolt
-    path: "M13 2L3 14h9l-1 8 10-12h-9l1-8z"
-  },
-  {
-    name: 'React',
-    color: '#61DAFB',
-    // Atom
-    path: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm0-10a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-6 2c0 2.2 2.7 4 6 4s6-1.8 6-4-2.7-4-6-4-6 1.8-6 4z"
-  },
-  {
-    name: 'Tailwind',
-    color: '#06B6D4',
-    // Waves
-    path: "M4 12c0-2 2-2 4 0s2 4 4 4 2-2 4-4 2-4 4-2 M4 6c0-2 2-2 4 0s2 4 4 4 2-2 4-4 2-4 4-2"
-  },
-  {
-    name: 'Supabase',
-    color: '#3ECF8E',
-    // Bolt/Drop
-    path: "M12 2L4 12h8l-2 10 10-10h-8l2-10z"
-  },
-  {
-    name: 'Git',
-    color: '#F05032',
-    // Branch
-    path: "M16 12h-2v-4h-2c-1.1 0-2 .9-2 2v5l-3-3-1.4 1.4 5.4 5.4 5.4-5.4-1.4-1.4-3 3V12z M7 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm10 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"
-  },
-  {
-    name: 'Node.js',
-    color: '#339933',
-    // Hexagon
-    path: "M12 2l9 5v10l-9 5-9-5V7l9-5z M12 11c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-2.3 0-4.6.6-6 1.7V17h12v-2.3c-1.4-1.1-3.7-1.7-6-1.7z"
-  },
-  {
-    name: 'GitHub',
-    color: '#181717',
-    // Octocat Outline (simplified)
-    path: "M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-1.98 1.02-2.68-.1-.28-.45-1.29.1-2.68 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.39.2 2.4.1 2.68.64.7 1.02 1.57 1.02 2.68 0 3.83-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.17 22 16.42 22 12A10 10 0 0 0 12 2z"
-  },
-  {
-    name: 'Netlify',
-    color: '#00C7B7',
-    // Geometric
-    path: "M4 4l6 10-6 6-4-10 4-6zm16 0l-6 10 6 6 4-10-4-6zm-8 16l-6-10h12l-6 10z"
-  },
-  {
-    name: 'Google Console',
-    color: '#4285F4',
-    // Cloud/Hexagon mix (GCP style)
-    path: "M12 2L3 7v10l9 5 9-5V7l-9-5zm0 2.5l6.5 3.6v7.8L12 19.5 5.5 15.9V8.1L12 4.5zM8 11h8M8 14h5"
-  },
-  {
-    name: 'Cloudflare',
-    color: '#F38020',
-    // Cloud
-    path: "M18 10h-1.26A5.002 5.002 0 0 0 8 10c0 .17.02.34.05.5a3 3 0 0 0-2.05 5.46L6 16h12a4 4 0 0 0 0-8z"
-  }
-];
-
 export default function TechCarousel() {
+  const [techStack, setTechStack] = useState<TechItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [scrollPos, setScrollPos] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    fetchTechStack();
+
     const handleScroll = () => {
       if (sectionRef.current) {
         const rect = sectionRef.current.getBoundingClientRect();
@@ -108,6 +44,31 @@ export default function TechCarousel() {
       observer.disconnect();
     };
   }, []);
+
+  const fetchTechStack = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('tech_stack')
+        .select('*')
+        .order('id');
+
+      if (error) {
+        console.error('Error fetching tech stack:', error);
+      } else {
+        setTechStack(data || []);
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <section className="py-32 bg-charcoal min-h-[60vh] flex justify-center items-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+    </section>;
+  }
 
   return (
     <section
@@ -136,14 +97,14 @@ export default function TechCarousel() {
           <div
             className="flex items-center gap-8 will-change-transform"
             style={{
-              transform: `translateX(${scrollPos - 600}px)`, // Adjusted offset for more items
+              transform: `translateX(${scrollPos - (techStack.length * 50)}px)`, // Adjusted offset dynamic based on count
               transition: 'transform 0.1s linear'
             }}
           >
             {techStack.map((tech, index) => {
               return (
                 <div
-                  key={tech.name}
+                  key={tech.name || index}
                   className="relative group w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0"
                 >
                   {/* Vertical Waving Animation */}
