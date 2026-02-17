@@ -175,6 +175,10 @@
       clip-path: none;
     }
   }
+
+  .hover-pause:hover {
+    animation-play-state: paused;
+  }
 }
 
 @keyframes float {
