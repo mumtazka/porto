@@ -74,7 +74,7 @@ export default function TechCarousel() {
     <section
       ref={sectionRef}
       id="skills"
-      className="relative py-32 bg-charcoal overflow-hidden min-h-[60vh] flex flex-col justify-center"
+      className="relative py-12 bg-charcoal overflow-hidden flex flex-col justify-center"
     >
       {/* Background Ambience */}
       <div className="absolute inset-0 pointer-events-none">
