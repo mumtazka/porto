@@ -313,52 +313,7 @@ export default function GitHubContributions() {
                 {!loading && !error && contributionData && stats && (
                     <div className={`space-y-6 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
 
-                        {/* Stats Row */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                            <div className="glass rounded-xl p-5 card-hover group">
-                                <div className="flex items-center gap-2 text-gray-500 text-sm mb-2">
-                                    <GitCommit className="w-4 h-4 text-orange-500 group-hover:scale-110 transition-transform" />
-                                    <span>Total Contributions</span>
-                                </div>
-                                <p className="text-3xl font-bold text-gray-900">
-                                    {stats.totalContributions.toLocaleString()}
-                                </p>
-                                <p className="text-xs text-gray-400 mt-1">past year</p>
-                            </div>
 
-                            <div className="glass rounded-xl p-5 card-hover group">
-                                <div className="flex items-center gap-2 text-gray-500 text-sm mb-2">
-                                    <Flame className="w-4 h-4 text-orange-500 group-hover:scale-110 transition-transform" />
-                                    <span>Current Streak</span>
-                                </div>
-                                <p className="text-3xl font-bold text-gray-900">
-                                    {stats.currentStreak}
-                                </p>
-                                <p className="text-xs text-gray-400 mt-1">days</p>
-                            </div>
-
-                            <div className="glass rounded-xl p-5 card-hover group">
-                                <div className="flex items-center gap-2 text-gray-500 text-sm mb-2">
-                                    <TrendingUp className="w-4 h-4 text-orange-500 group-hover:scale-110 transition-transform" />
-                                    <span>Longest Streak</span>
-                                </div>
-                                <p className="text-3xl font-bold text-gray-900">
-                                    {stats.longestStreak}
-                                </p>
-                                <p className="text-xs text-gray-400 mt-1">days</p>
-                            </div>
-
-                            <div className="glass rounded-xl p-5 card-hover group">
-                                <div className="flex items-center gap-2 text-gray-500 text-sm mb-2">
-                                    <Calendar className="w-4 h-4 text-orange-500 group-hover:scale-110 transition-transform" />
-                                    <span>Active Days</span>
-                                </div>
-                                <p className="text-3xl font-bold text-gray-900">
-                                    {stats.activeDays}
-                                </p>
-                                <p className="text-xs text-gray-400 mt-1">of 365</p>
-                            </div>
-                        </div>
 
                         {/* Contribution Graph */}
                         <div className="glass rounded-2xl p-6 sm:p-8">

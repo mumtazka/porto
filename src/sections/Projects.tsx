@@ -309,7 +309,27 @@ export default function Projects() {
         )}
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 lg:pl-28">
+          {/* Other Projects - Grid Layout */}
+          {!loading && otherProjects.length > 0 && (
+            <div className="relative">
+              <div className="flex items-center gap-4 mb-12">
+                <div className="h-px bg-gray-200 flex-1" />
+                <h3 className="text-2xl font-bold text-gray-900">Archive</h3>
+                <div className="h-px bg-gray-200 flex-1" />
+              </div>
 
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {otherProjects.map((project, index) => (
+                  <StandardProjectCard
+                    key={project.id}
+                    project={project}
+                    index={index}
+                    openModal={() => setSelectedProjectId(project.id)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Footer Link */}
           <div className="text-center mt-24">
