@@ -155,13 +155,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '1200ms' }}>
-        <span className="text-gray-500 text-xs">Scroll to explore</span>
-        <div className="w-6 h-10 border-2 border-gray-600 rounded-full flex justify-center pt-2">
-          <div className="w-1 h-2 bg-orange-500 rounded-full animate-bounce" />
-        </div>
-      </div>
+
     </section>
   );
 }
