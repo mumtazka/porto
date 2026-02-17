@@ -115,7 +115,7 @@ function FeaturedProjectCard({ project, index, total, openModal }: { project: Pr
       className="sticky transition-all duration-500"
       style={{
         top: `${cardTopOffset}px`,
-        marginBottom: `${(total - index - 1) * 250}px`, // Add significant margin bottom to creates spacing so they don't just sit on top immediately but require scrolling
+        marginBottom: `${(total - index - 1) * 100}px`, // Reduced margin for tighter stacking
         zIndex: index + 10
       }}
     >
@@ -123,9 +123,9 @@ function FeaturedProjectCard({ project, index, total, openModal }: { project: Pr
         className="group relative grid lg:grid-cols-2 gap-0 lg:gap-8 bg-white/90 backdrop-blur-xl rounded-[2.5rem] border border-white/60 shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 will-change-transform transform hover:-translate-y-2"
       >
         {/* Content Column */}
-        <div className="p-8 lg:p-16 flex flex-col justify-center order-2 lg:order-1 relative overflow-hidden">
+        <div className="p-8 lg:p-10 flex flex-col justify-center order-2 lg:order-1 relative overflow-hidden">
           {/* Decorative Number */}
-          <div className="absolute top-4 left-4 lg:top-8 lg:left-8 opacity-[0.03] text-[10rem] leading-none font-black text-gray-900 select-none pointer-events-none">
+          <div className="absolute top-4 left-4 lg:top-6 lg:left-6 opacity-[0.03] text-[6rem] leading-none font-black text-gray-900 select-none pointer-events-none">
             {(index + 1).toString().padStart(2, '0')}
           </div>
 
@@ -194,7 +194,7 @@ function FeaturedProjectCard({ project, index, total, openModal }: { project: Pr
 
         {/* Image Column */}
         <div
-          className="relative h-64 lg:h-auto min-h-[300px] lg:min-h-[600px] overflow-hidden order-1 lg:order-2 cursor-pointer clip-path-slant"
+          className="relative h-64 lg:h-auto min-h-[300px] lg:min-h-[450px] overflow-hidden order-1 lg:order-2 cursor-pointer clip-path-slant"
           onClick={openModal}
         >
           <div className="absolute inset-0 bg-gray-900/10 group-hover:bg-transparent transition-colors duration-500 z-10" />
