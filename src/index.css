@@ -165,6 +165,16 @@
   .animate-bounce-subtle {
     animation: bounce-subtle 2s ease-in-out infinite;
   }
+
+  .clip-path-slant {
+    clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%);
+  }
+
+  @media (max-width: 1024px) {
+    .clip-path-slant {
+      clip-path: none;
+    }
+  }
 }
 
 @keyframes float {
