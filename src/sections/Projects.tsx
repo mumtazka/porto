@@ -267,10 +267,8 @@ export default function Projects() {
       <div className="relative z-10 w-full">
 
         {/* Section Header */}
+
         <div className={`text-center mb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-          <span className="inline-block px-4 py-2 glass rounded-full text-orange-500 text-sm font-bold tracking-wide mb-6 border border-orange-100">
-            SELECTED WORKS
-          </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
             Featured <span className="text-gradient">Showcase</span>
           </h2>
@@ -348,9 +346,11 @@ export default function Projects() {
       </div>
 
       {/* Modal is global to the section */}
-      {selectedProject && (
-        <ProjectModal project={selectedProject} onClose={() => setSelectedProjectId(null)} />
-      )}
-    </section>
+      {
+        selectedProject && (
+          <ProjectModal project={selectedProject} onClose={() => setSelectedProjectId(null)} />
+        )
+      }
+    </section >
   );
 }

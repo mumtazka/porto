@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { Calendar, Award, GraduationCap, ExternalLink } from 'lucide-react';
+import { Calendar, Award, ExternalLink } from 'lucide-react';
 import { useEducation } from '../hooks/useSupabase';
 
 function formatDate(dateString: string): string {
@@ -207,10 +207,7 @@ export default function Education() {
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 lg:pl-28">
         {/* Section Header */}
         <div className={`text-center mb-16 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <span className="inline-block px-4 py-2 glass rounded-full text-orange-400 text-sm font-medium mb-4">
-            <GraduationCap className="w-4 h-4 inline mr-2" />
-            Learning Journey
-          </span>
+
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
             Education & <span className="text-gradient">Achievements</span>
           </h2>

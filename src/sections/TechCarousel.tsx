@@ -84,9 +84,7 @@ export default function TechCarousel() {
 
       <div className="container mx-auto px-4 z-10 relative">
         <div className={`text-center mb-16 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <span className="inline-block px-4 py-2 glass rounded-full text-orange-400 text-sm font-medium mb-4">
-            My Arsenal
-          </span>
+
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
             Tech Stack & <span className="text-gradient">Tools</span>
           </h2>
