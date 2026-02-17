@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useMemo } from 'react';
-import { Github, GitCommit, Star, GitPullRequest, Calendar, Flame, TrendingUp, ExternalLink } from 'lucide-react';
+import { Github, GitCommit, Star, GitPullRequest, ExternalLink } from 'lucide-react';
 
 const GITHUB_USERNAME = 'mumtazka';
 
@@ -436,47 +436,7 @@ export default function GitHubContributions() {
                             </div>
                         </div>
 
-                        {/* Additional Stats Row */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div className="glass rounded-xl p-5 card-hover">
-                                <div className="flex items-center justify-between mb-3">
-                                    <span className="text-sm text-gray-500">Avg. per active day</span>
-                                    <TrendingUp className="w-4 h-4 text-orange-500" />
-                                </div>
-                                <p className="text-2xl font-bold text-gray-900">{stats.avgPerDay}</p>
-                                <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-gradient-to-r from-orange-500 to-amber-400 rounded-full transition-all duration-1000"
-                                        style={{ width: `${Math.min((parseFloat(stats.avgPerDay) / 10) * 100, 100)}%` }}
-                                    />
-                                </div>
-                            </div>
 
-                            <div className="glass rounded-xl p-5 card-hover">
-                                <div className="flex items-center justify-between mb-3">
-                                    <span className="text-sm text-gray-500">Best day</span>
-                                    <Flame className="w-4 h-4 text-orange-500" />
-                                </div>
-                                <p className="text-2xl font-bold text-gray-900">{stats.maxContributions}</p>
-                                <p className="text-xs text-gray-400 mt-1">contributions in a single day</p>
-                            </div>
-
-                            <div className="glass rounded-xl p-5 card-hover">
-                                <div className="flex items-center justify-between mb-3">
-                                    <span className="text-sm text-gray-500">Activity rate</span>
-                                    <Calendar className="w-4 h-4 text-orange-500" />
-                                </div>
-                                <p className="text-2xl font-bold text-gray-900">
-                                    {((stats.activeDays / 365) * 100).toFixed(0)}%
-                                </p>
-                                <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-gradient-to-r from-cyan-500 to-orange-400 rounded-full transition-all duration-1000"
-                                        style={{ width: `${(stats.activeDays / 365) * 100}%` }}
-                                    />
-                                </div>
-                            </div>
-                        </div>
 
                         {/* View Profile Link */}
                         <div className="text-center pt-4">
