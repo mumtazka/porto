@@ -58,9 +58,7 @@ export default function Hero() {
           <div className="order-2 lg:order-1">
             {/* Greeting */}
             <div className={`transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-              <span className="inline-block px-4 py-2 glass rounded-full text-orange-400 text-sm font-medium mb-6">
-                Hello, I'm
-              </span>
+
             </div>
 
             {/* Name */}

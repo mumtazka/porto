@@ -1,4 +1,4 @@
-import { useState } from 'react';
+
 
 import AIChatbot from './components/AIChatbot';
 import Hero from './sections/Hero';
@@ -26,8 +26,6 @@ function HomePage() {
 }
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'admin'>('home');
-
   // Check URL for admin route
   if (window.location.pathname === '/admin') {
     return <Admin />;

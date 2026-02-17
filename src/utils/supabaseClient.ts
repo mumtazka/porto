@@ -14,7 +14,7 @@ if (!isConfigured) {
 export const supabase = isConfigured
   ? createClient(supabaseUrl, supabaseAnonKey)
   : {
-    from: (table: string) => ({
+    from: (_table: string) => ({
       select: () => ({
         order: () => Promise.resolve({ data: [], error: null }),
         eq: () => Promise.resolve({ data: [], error: null }),

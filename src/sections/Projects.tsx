@@ -161,66 +161,6 @@ function FeaturedProjectCard({ project, onClick }: { project: Project; onClick: 
   );
 }
 
-function StandardProjectCard({ project, index, openModal }: { project: Project; index: number; openModal: () => void }) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (cardRef.current) observer.observe(cardRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div
-      ref={cardRef}
-      className={`group relative transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
-      style={{ transitionDelay: `${index * 100}ms` }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={openModal}
-    >
-      <div className="relative overflow-hidden rounded-2xl glass cursor-pointer h-full flex flex-col hover:border-orange-500/30 transition-colors duration-300">
-        <div className="relative h-48 overflow-hidden">
-          <img
-            src={project.image_url}
-            alt={project.title}
-            className={`w-full h-full object-cover transition-transform duration-500 ${isHovered ? 'scale-110' : 'scale-100'}`}
-          />
-          <div className={`absolute inset-0 bg-black/20 transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`} />
-        </div>
-
-        <div className="p-5 flex-1 flex flex-col">
-          <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">
-            {project.title}
-          </h3>
-          <p className="text-gray-600 text-sm line-clamp-2 mb-4 flex-1">
-            {project.description}
-          </p>
-
-          <div className="flex flex-wrap gap-2 mt-auto">
-            {project.tech_stack.slice(0, 3).map((tech) => (
-              <span key={tech} className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600 font-medium">
-                {tech}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function Projects() {
   const { projects, loading } = useProjects();
   const [isVisible, setIsVisible] = useState(false);
@@ -242,8 +182,6 @@ export default function Projects() {
   }, []);
 
   const featuredProjects = projects.filter(p => p.featured);
-  const otherProjects = projects.filter(p => !p.featured);
-
   // Create duplicates for seamless loop, ensure minimum length
   const carouselItems = featuredProjects.length > 0
     ? [...featuredProjects, ...featuredProjects, ...featuredProjects] // Triple up to ensure enough content for smooth loop
@@ -307,27 +245,7 @@ export default function Projects() {
         )}
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 lg:pl-28">
-          {/* Other Projects - Grid Layout */}
-          {!loading && otherProjects.length > 0 && (
-            <div className="relative">
-              <div className="flex items-center gap-4 mb-12">
-                <div className="h-px bg-gray-200 flex-1" />
-                <h3 className="text-2xl font-bold text-gray-900">Archive</h3>
-                <div className="h-px bg-gray-200 flex-1" />
-              </div>
 
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {otherProjects.map((project, index) => (
-                  <StandardProjectCard
-                    key={project.id}
-                    project={project}
-                    index={index}
-                    openModal={() => setSelectedProjectId(project.id)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Footer Link */}
           <div className="text-center mt-24">
