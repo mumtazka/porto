@@ -126,6 +126,65 @@ export interface Database {
           created_at?: string;
         };
       };
+      personal_context: {
+        Row: {
+          id: number;
+          name: string | null;
+          role: string | null;
+          location: string | null;
+          bio: string | null;
+          email: string | null;
+          phone: string | null;
+          linkedin: string | null;
+          github: string | null;
+          instagram: string | null;
+          availability: string | null;
+          years_of_experience: string | null;
+          skills: string | null;
+          interests: string | null;
+          languages: string | null;
+          extra_notes: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: number;
+          name?: string | null;
+          role?: string | null;
+          location?: string | null;
+          bio?: string | null;
+          email?: string | null;
+          phone?: string | null;
+          linkedin?: string | null;
+          github?: string | null;
+          instagram?: string | null;
+          availability?: string | null;
+          years_of_experience?: string | null;
+          skills?: string | null;
+          interests?: string | null;
+          languages?: string | null;
+          extra_notes?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: number;
+          name?: string | null;
+          role?: string | null;
+          location?: string | null;
+          bio?: string | null;
+          email?: string | null;
+          phone?: string | null;
+          linkedin?: string | null;
+          github?: string | null;
+          instagram?: string | null;
+          availability?: string | null;
+          years_of_experience?: string | null;
+          skills?: string | null;
+          interests?: string | null;
+          languages?: string | null;
+          extra_notes?: string | null;
+          created_at?: string;
+        };
+      };
     };
   };
 }

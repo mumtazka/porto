@@ -19,7 +19,7 @@ import {
   RotateCcw,
   CheckCircle2
 } from 'lucide-react';
-import { useProjects, useEducation, useAchievements, useMessages, usePersonalContext } from '../hooks/useSupabase';
+import { useAuth, useProjects, useEducation, useAchievements, useMessages, usePersonalContext } from '../hooks/useSupabase';
 import type { Project, Education, Achievement } from '../types/database';
 
 type Tab = 'projects' | 'education' | 'achievements' | 'messages' | 'ai-context';
@@ -83,15 +83,15 @@ const INITIAL_ACHIEVEMENT_FORM: AchievementFormData = {
 };
 
 export default function Admin() {
+  const { user, loading: authLoading, signIn, signOut } = useAuth();
   const { projects, loading: projectsLoading, addProject, updateProject, deleteProject } = useProjects();
   const { context: aiContext, updateContext: updateAiContext, resetContext: resetAiContext } = usePersonalContext();
   const { education, loading: educationLoading, addEducation, updateEducation, deleteEducation } = useEducation();
   const { achievements, loading: achievementsLoading, addAchievement, updateAchievement, deleteAchievement } = useAchievements();
   const { messages, fetchMessages, deleteMessage } = useMessages();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('projects');
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -105,24 +105,27 @@ export default function Admin() {
   const [selectedMessage, setSelectedMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (user) {
       fetchMessages();
     }
-  }, [isLoggedIn, fetchMessages]);
+  }, [user, fetchMessages]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username === 'mumtaz' && password === 'mumtaz1307') {
-      setIsLoggedIn(true);
-      setLoginError('');
-    } else {
-      setLoginError('Invalid username or password.');
+    setLoginError('');
+
+    // Auto-append domain if just username entered (helper for Mumtaz)
+    const emailToUse = email.includes('@') ? email : `${email}@gmail.com`;
+
+    const { error } = await signIn(emailToUse, password);
+    if (error) {
+      setLoginError(error.message);
     }
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUsername('');
+  const handleLogout = async () => {
+    await signOut();
+    setEmail('');
     setPassword('');
   };
 
@@ -265,7 +268,7 @@ export default function Admin() {
   ];
 
   // Login Screen
-  if (!isLoggedIn) {
+  if (!user && !authLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
@@ -279,13 +282,13 @@ export default function Admin() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email or Username</label>
               <input
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="Enter username"
+                placeholder="mumtaz@gmail.com"
                 required
               />
             </div>
@@ -316,6 +319,15 @@ export default function Admin() {
             Back to Portfolio
           </a>
         </div>
+      </div>
+    );
+  }
+
+  // Loading State
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
       </div>
     );
   }
