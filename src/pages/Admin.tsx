@@ -16,7 +16,7 @@ import {
   ExternalLink,
   Eye
 } from 'lucide-react';
-import { useAuth, useProjects, useEducation, useAchievements, useMessages } from '../hooks/useSupabase';
+import { useProjects, useEducation, useAchievements, useMessages } from '../hooks/useSupabase';
 import type { Project, Education, Achievement } from '../types/database';
 
 type Tab = 'projects' | 'education' | 'achievements' | 'messages';
@@ -80,15 +80,16 @@ const INITIAL_ACHIEVEMENT_FORM: AchievementFormData = {
 };
 
 export default function Admin() {
-  const { user, loading: authLoading, signIn, signOut } = useAuth();
   const { projects, loading: projectsLoading, addProject, updateProject, deleteProject } = useProjects();
   const { education, loading: educationLoading, addEducation, updateEducation, deleteEducation } = useEducation();
   const { achievements, loading: achievementsLoading, addAchievement, updateAchievement, deleteAchievement } = useAchievements();
   const { messages, fetchMessages, deleteMessage } = useMessages();
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('projects');
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [editingEducation, setEditingEducation] = useState<Education | null>(null);
@@ -100,21 +101,25 @@ export default function Admin() {
   const [selectedMessage, setSelectedMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user) {
+    if (isLoggedIn) {
       fetchMessages();
     }
-  }, [user, fetchMessages]);
+  }, [isLoggedIn, fetchMessages]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await signIn(email, password);
-    if (error) {
-      alert('Login failed: ' + error.message);
+    if (username === 'mumtaz' && password === 'mumtaz1307') {
+      setIsLoggedIn(true);
+      setLoginError('');
+    } else {
+      setLoginError('Invalid username or password.');
     }
   };
 
-  const handleLogout = async () => {
-    await signOut();
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setUsername('');
+    setPassword('');
   };
 
   // Project modal
@@ -255,7 +260,7 @@ export default function Admin() {
   ];
 
   // Login Screen
-  if (!user && !authLoading) {
+  if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
@@ -265,18 +270,17 @@ export default function Admin() {
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
             <p className="text-gray-500">Sign in to manage your portfolio</p>
-            <p className="text-gray-400 text-sm mt-2">Demo: admin@example.com / admin</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="admin@example.com"
+                placeholder="Enter username"
                 required
               />
             </div>
@@ -291,6 +295,9 @@ export default function Admin() {
                 required
               />
             </div>
+            {loginError && (
+              <p className="text-red-500 text-sm text-center">{loginError}</p>
+            )}
             <button type="submit" className="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold rounded-xl hover:shadow-lg hover:scale-[1.01] transition-all">
               Sign In
             </button>
@@ -304,15 +311,6 @@ export default function Admin() {
             Back to Portfolio
           </a>
         </div>
-      </div>
-    );
-  }
-
-  // Loading State
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
       </div>
     );
   }
@@ -339,8 +337,8 @@ export default function Admin() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${activeTab === tab.id
-                  ? 'bg-orange-50 text-orange-600 font-medium shadow-sm'
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                ? 'bg-orange-50 text-orange-600 font-medium shadow-sm'
+                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
                 }`}
             >
               <div className="flex items-center gap-3">
@@ -349,8 +347,8 @@ export default function Admin() {
               </div>
               {tab.count !== undefined && (
                 <span className={`text-xs px-2 py-0.5 rounded-full ${activeTab === tab.id
-                    ? 'bg-orange-100 text-orange-600'
-                    : 'bg-gray-100 text-gray-500'
+                  ? 'bg-orange-100 text-orange-600'
+                  : 'bg-gray-100 text-gray-500'
                   }`}>
                   {tab.count}
                 </span>
@@ -400,8 +398,8 @@ export default function Admin() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${activeTab === tab.id
-                  ? 'bg-orange-500 text-white'
-                  : 'text-gray-500 hover:bg-gray-100'
+                ? 'bg-orange-500 text-white'
+                : 'text-gray-500 hover:bg-gray-100'
                 }`}
             >
               {tab.icon}

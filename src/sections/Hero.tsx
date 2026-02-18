@@ -40,20 +40,20 @@ export default function Hero() {
           }}
         />
 
-        {/* Floating Code Snippets */}
-        <div className={`absolute top-32 right-20 glass px-4 py-2 rounded-lg transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '800ms' }}>
+        {/* Floating Code Snippets - hidden on mobile */}
+        <div className={`hidden sm:block absolute top-32 right-20 glass px-4 py-2 rounded-lg transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '800ms' }}>
           <code className="text-xs text-cyan-400 font-mono">const dev = new Developer();</code>
         </div>
-        <div className={`absolute bottom-40 left-20 glass px-4 py-2 rounded-lg transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '1000ms' }}>
+        <div className={`hidden sm:block absolute bottom-40 left-20 glass px-4 py-2 rounded-lg transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '1000ms' }}>
           <code className="text-xs text-orange-400 font-mono">&lt;FullStack /&gt;</code>
         </div>
-        <div className={`absolute top-1/3 right-1/3 glass px-4 py-2 rounded-lg transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '1200ms' }}>
+        <div className={`hidden lg:block absolute top-1/3 right-1/3 glass px-4 py-2 rounded-lg transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '1200ms' }}>
           <code className="text-xs text-amber-400 font-mono">npm run build:success</code>
         </div>
       </div>
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-20 lg:py-0 lg:pl-24">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-16 pb-24 lg:pb-16 lg:py-0 lg:pl-24">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           {/* Left Column - Content */}
           <div className="order-2 lg:order-1">
             {/* Greeting */}
@@ -116,15 +116,12 @@ export default function Hero() {
 
                 {/* Glass Card */}
                 <div className="relative w-full h-full glass-strong rounded-3xl overflow-hidden animate-float">
-                  {/* Placeholder for Profile Image */}
-                  <div className="w-full h-full bg-gradient-to-br from-charcoal-light to-charcoal flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="w-32 h-32 mx-auto mb-4 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-glow-strong">
-                        <span className="text-5xl font-bold text-white">M</span>
-                      </div>
-                      <p className="text-gray-500 text-sm">Full Stack Developer</p>
-                    </div>
-                  </div>
+                  {/* Real Profile Photo */}
+                  <img
+                    src="/mumtaz-photo.jpg"
+                    alt="Mumtaz Kholafiyan Alfan"
+                    className="w-full h-full object-cover object-top"
+                  />
 
                   {/* Border Gradient */}
                   <div className="absolute inset-0 rounded-3xl border-2 border-gradient opacity-50" />
