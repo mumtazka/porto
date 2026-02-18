@@ -192,5 +192,5 @@ export const mockAchievements = [
 
 // Helper function to check if Supabase is configured
 export const isSupabaseConfigured = () => {
-  return false; // Set to true when Supabase is configured
+  return isConfigured;
 };

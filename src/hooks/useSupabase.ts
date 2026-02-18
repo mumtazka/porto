@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { mockProjects, mockEducation, mockAchievements, isSupabaseConfigured } from '../utils/supabaseClient';
+import { mockProjects, mockEducation, mockAchievements, isSupabaseConfigured, supabase } from '../utils/supabaseClient';
 import type { Project, Education, Message, Achievement } from '../types/database';
 
 // Helper: load from localStorage or fallback
@@ -270,7 +270,6 @@ export const useAuth = () => {
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
-      // Check localStorage for persisted session
       const storedUser = localStorage.getItem('portfolio_admin_user');
       if (storedUser) {
         setUser(JSON.parse(storedUser));
@@ -278,12 +277,25 @@ export const useAuth = () => {
       setLoading(false);
       return;
     }
-    setLoading(false);
+
+    // Supabase auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const signIn = async (email: string, password: string) => {
     if (!isSupabaseConfigured()) {
-      if (email === 'admin@example.com' && password === 'admin') {
+      if (email === 'munas@gmail.com' && password === 'mumtaz1307') {
         const userData = { email };
         setUser(userData);
         localStorage.setItem('portfolio_admin_user', JSON.stringify(userData));
@@ -291,10 +303,23 @@ export const useAuth = () => {
       }
       return { error: { message: 'Invalid credentials' } };
     }
-    return { data: null, error: null };
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      return { error };
+    }
+
+    return { data, error: null };
   };
 
   const signOut = async () => {
+    if (isSupabaseConfigured()) {
+      await supabase.auth.signOut();
+    }
     setUser(null);
     localStorage.removeItem('portfolio_admin_user');
     return { error: null };
