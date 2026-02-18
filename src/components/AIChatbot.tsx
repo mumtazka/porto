@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot, User, Sparkles } from 'lucide-react';
+import { getPersonalContext } from '../hooks/useSupabase';
 
 interface Message {
   id: string;
@@ -17,34 +18,87 @@ const INITIAL_MESSAGES: Message[] = [
   },
 ];
 
-const SYSTEM_PROMPT = `You are an AI assistant for Mumtaz Kholafiyan Alfan's personal portfolio website. Your role is to answer questions about Mumtaz in a friendly, professional, and concise manner. You can respond in Bahasa Indonesia if the user writes in Indonesian.
+/** Build a fresh system prompt from localStorage context + live portfolio data */
+function buildSystemPrompt(): string {
+  const ctx = getPersonalContext();
 
-Here is information about Mumtaz:
+  // Read live data from localStorage (written by the hooks)
+  let projectsText = '';
+  try {
+    const raw = localStorage.getItem('portfolio_projects');
+    if (raw) {
+      const projects = JSON.parse(raw) as Array<{ title: string; description: string; tech_stack: string[]; featured: boolean }>;
+      projectsText = projects
+        .map(p => `  - ${p.title}${p.featured ? ' ⭐' : ''}: ${p.description} [Tech: ${p.tech_stack.join(', ')}]`)
+        .join('\n');
+    }
+  } catch { }
 
-- Name: Mumtaz Kholafiyan Alfan
-- Role: Full Stack Developer
-- Location: Yogyakarta, Indonesia
-- Experience: 5+ years in full-stack web development
-- Education: Bachelor of Computer Science from Universitas Gadjah Mada
-- Technical Skills: React, Node.js, TypeScript, PostgreSQL, MongoDB, Tailwind CSS, Next.js, Python, Docker, AWS, GraphQL, Redis, Vue.js, Angular, Express, Prisma, Firebase, Git, Figma, Linux, Nginx, Jest, Vite, Supabase
-- Certifications: Google Cloud Professional Architect, AWS Solutions Architect, Meta Front-End Developer
-- Notable Projects: 
-  1. E-Commerce Platform with real-time inventory
-  2. Task Management App with collaborative features
-  3. AI Content Generator using NLP
-  4. Social Media Dashboard with analytics
-- Interests: Open source contribution, Machine Learning, Cloud Architecture, UI/UX Design
-- Availability: Open to freelance projects and full-time opportunities
-- Contact: Can be reached through the contact form on the website or via LinkedIn
+  let educationText = '';
+  try {
+    const raw = localStorage.getItem('portfolio_education');
+    if (raw) {
+      const edu = JSON.parse(raw) as Array<{ institution: string; degree: string; field: string; start_date: string; end_date: string }>;
+      educationText = edu
+        .map(e => `  - ${e.degree} in ${e.field} @ ${e.institution} (${e.start_date.slice(0, 4)}–${e.end_date.slice(0, 4)})`)
+        .join('\n');
+    }
+  } catch { }
 
-Guidelines:
+  let achievementsText = '';
+  try {
+    const raw = localStorage.getItem('portfolio_achievements');
+    if (raw) {
+      const ach = JSON.parse(raw) as Array<{ title: string; issuer: string; date: string }>;
+      achievementsText = ach
+        .map(a => `  - ${a.title} by ${a.issuer} (${a.date.slice(0, 4)})`)
+        .join('\n');
+    }
+  } catch { }
+
+  return `You are an AI assistant for ${ctx.name}'s personal portfolio website. Your role is to answer questions about ${ctx.name} in a friendly, professional, and concise manner. You can respond in Bahasa Indonesia if the user writes in Indonesian.
+
+Here is the most up-to-date information about ${ctx.name}:
+
+PERSONAL INFO:
+- Full Name: ${ctx.name}
+- Role / Title: ${ctx.role}
+- Location: ${ctx.location}
+- Years of Experience: ${ctx.yearsOfExperience}
+- Bio: ${ctx.bio}
+- Availability: ${ctx.availability}
+- Languages spoken: ${ctx.languages}
+
+CONTACT:
+- Email: ${ctx.email}
+- Phone: ${ctx.phone}
+- LinkedIn: ${ctx.linkedin}
+- GitHub: ${ctx.github}
+- Instagram: ${ctx.instagram}
+
+TECHNICAL SKILLS:
+${ctx.skills}
+
+INTERESTS:
+${ctx.interests}
+
+${projectsText ? `PROJECTS:\n${projectsText}` : ''}
+
+${educationText ? `EDUCATION & CERTIFICATIONS:\n${educationText}` : ''}
+
+${achievementsText ? `ACHIEVEMENTS:\n${achievementsText}` : ''}
+
+${ctx.extraNotes ? `ADDITIONAL NOTES:\n${ctx.extraNotes}` : ''}
+
+GUIDELINES:
 - Keep responses concise (2-3 sentences max unless more detail is asked)
 - Be enthusiastic and professional
-- If asked something unrelated to Mumtaz, politely redirect to topics about him
+- If asked something unrelated to ${ctx.name}, politely redirect to topics about him
 - Use a friendly, conversational tone
 - Match the language the user uses (if they write in Indonesian, respond in Indonesian)
 - Do not make up information not listed above
 - Always base your answers strictly on the data provided above`;
+}
 
 async function callGeminiAPI(userMessage: string): Promise<string> {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -54,19 +108,19 @@ async function callGeminiAPI(userMessage: string): Promise<string> {
     return getFallbackResponse(userMessage);
   }
 
+  const systemPrompt = buildSystemPrompt();
+
   try {
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [
             {
               role: 'user',
-              parts: [{ text: `${SYSTEM_PROMPT}\n\nUser message: ${userMessage}` }],
+              parts: [{ text: `${systemPrompt}\n\nUser message: ${userMessage}` }],
             },
           ],
           generationConfig: {
@@ -101,30 +155,46 @@ async function callGeminiAPI(userMessage: string): Promise<string> {
 }
 
 function getFallbackResponse(input: string): string {
+  const ctx = getPersonalContext();
   const lowerInput = input.toLowerCase();
 
   if (lowerInput.includes('skill') || lowerInput.includes('tech') || lowerInput.includes('stack')) {
-    return 'Mumtaz is proficient in: React, Node.js, TypeScript, PostgreSQL, MongoDB, Tailwind CSS, Next.js, Python, Docker, AWS, GraphQL, Redis. He\'s always learning new technologies!';
+    return `${ctx.name} is proficient in: ${ctx.skills}. Always learning new technologies!`;
   }
   if (lowerInput.includes('experience') || lowerInput.includes('work') || lowerInput.includes('job')) {
-    return 'Mumtaz has 5+ years of experience in full-stack web development. He\'s worked with startups and enterprise clients, delivering scalable solutions.';
+    return `${ctx.name} has ${ctx.yearsOfExperience} years of experience as a ${ctx.role}. ${ctx.availability}.`;
   }
   if (lowerInput.includes('project') || lowerInput.includes('portfolio')) {
-    return 'Some notable projects include: E-Commerce Platform with real-time inventory, Task Management App, AI Content Generator using NLP, and Social Media Dashboard.';
+    try {
+      const raw = localStorage.getItem('portfolio_projects');
+      if (raw) {
+        const projects = JSON.parse(raw) as Array<{ title: string; featured: boolean }>;
+        const featured = projects.filter(p => p.featured).map(p => p.title);
+        if (featured.length) return `Featured projects include: ${featured.join(', ')}. Check the Projects section for details!`;
+      }
+    } catch { }
+    return `${ctx.name} has worked on various exciting projects. Check the Projects section to see them all!`;
   }
-  if (lowerInput.includes('education') || lowerInput.includes('degree') || lowerInput.includes('study')) {
-    return 'Mumtaz holds a Bachelor of Computer Science from Universitas Gadjah Mada. He\'s also certified as a Google Cloud Professional Architect, AWS Solutions Architect, and Meta Front-End Developer.';
+  if (lowerInput.includes('education') || lowerInput.includes('degree') || lowerInput.includes('study') || lowerInput.includes('certificate')) {
+    try {
+      const raw = localStorage.getItem('portfolio_education');
+      if (raw) {
+        const edu = JSON.parse(raw) as Array<{ institution: string; degree: string }>;
+        if (edu.length) return `${ctx.name}'s education includes: ${edu.map(e => `${e.degree} from ${e.institution}`).join('; ')}.`;
+      }
+    } catch { }
+    return `${ctx.name} has a strong academic background. Check the Education section for full details.`;
   }
   if (lowerInput.includes('contact') || lowerInput.includes('hire') || lowerInput.includes('email')) {
-    return 'You can reach Mumtaz through the contact form on this website or connect with him on LinkedIn. He\'s open to freelance projects and full-time opportunities.';
+    return `You can reach ${ctx.name} at ${ctx.email} or through the contact form on this website. ${ctx.availability}.`;
   }
   if (lowerInput.includes('location') || lowerInput.includes('where') || lowerInput.includes('from')) {
-    return 'Mumtaz is based in Yogyakarta, Indonesia. He\'s open to remote work opportunities worldwide.';
+    return `${ctx.name} is based in ${ctx.location}. Open to remote work opportunities worldwide.`;
   }
   if (lowerInput.includes('hello') || lowerInput.includes('hi') || lowerInput.includes('hey') || lowerInput.includes('halo')) {
-    return "Hello! Great to meet you! I'm here to help you learn more about Mumtaz. Feel free to ask about his skills, experience, projects, or anything else!";
+    return `Hello! Great to meet you! I'm here to help you learn more about ${ctx.name}. Feel free to ask about skills, experience, projects, or how to get in touch!`;
   }
-  return "That's an interesting question! Mumtaz is a passionate Full Stack Developer with expertise in modern web technologies. Would you like to know about his technical skills, projects, or how to get in touch?";
+  return `${ctx.name} is a passionate ${ctx.role} with expertise in modern web technologies. Would you like to know about skills, projects, or how to get in touch?`;
 }
 
 export default function AIChatbot() {
@@ -235,7 +305,7 @@ export default function AIChatbot() {
                     AI Assistant
                     <Sparkles className="w-4 h-4 text-amber-400" />
                   </h4>
-                  <p className="text-gray-500 text-xs">Powered by Gemini</p>
+                  <p className="text-gray-500 text-xs">Powered by Gemini · Live context</p>
                 </div>
               </div>
               <button

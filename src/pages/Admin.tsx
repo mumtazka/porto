@@ -14,12 +14,15 @@ import {
   Loader2,
   ArrowLeft,
   ExternalLink,
-  Eye
+  Eye,
+  Brain,
+  RotateCcw,
+  CheckCircle2
 } from 'lucide-react';
-import { useProjects, useEducation, useAchievements, useMessages } from '../hooks/useSupabase';
+import { useProjects, useEducation, useAchievements, useMessages, usePersonalContext } from '../hooks/useSupabase';
 import type { Project, Education, Achievement } from '../types/database';
 
-type Tab = 'projects' | 'education' | 'achievements' | 'messages';
+type Tab = 'projects' | 'education' | 'achievements' | 'messages' | 'ai-context';
 
 interface ProjectFormData {
   title: string;
@@ -81,6 +84,7 @@ const INITIAL_ACHIEVEMENT_FORM: AchievementFormData = {
 
 export default function Admin() {
   const { projects, loading: projectsLoading, addProject, updateProject, deleteProject } = useProjects();
+  const { context: aiContext, updateContext: updateAiContext, resetContext: resetAiContext } = usePersonalContext();
   const { education, loading: educationLoading, addEducation, updateEducation, deleteEducation } = useEducation();
   const { achievements, loading: achievementsLoading, addAchievement, updateAchievement, deleteAchievement } = useAchievements();
   const { messages, fetchMessages, deleteMessage } = useMessages();
@@ -257,6 +261,7 @@ export default function Admin() {
     { id: 'education', label: 'Education', icon: <GraduationCap className="w-5 h-5" />, count: education.length },
     { id: 'achievements', label: 'Achievements', icon: <Award className="w-5 h-5" />, count: achievements.length },
     { id: 'messages', label: 'Messages', icon: <Mail className="w-5 h-5" />, count: messages.length },
+    { id: 'ai-context', label: 'AI Brain', icon: <Brain className="w-5 h-5" /> },
   ];
 
   // Login Screen
@@ -691,7 +696,251 @@ export default function Admin() {
             )}
           </div>
         )}
+
+        {/* AI Brain / Context Tab */}
+        {activeTab === 'ai-context' && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                  <Brain className="w-7 h-7 text-orange-500" />
+                  AI Brain
+                </h2>
+                <p className="text-gray-500 text-sm mt-1">
+                  Edit the information the AI chatbot uses to answer questions about you. Changes are saved instantly.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  if (confirm('Reset all AI context to default values?')) resetAiContext();
+                }}
+                className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 text-gray-600 font-medium rounded-xl hover:bg-gray-50 transition-all"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Reset to Default
+              </button>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Personal Info Card */}
+              <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-orange-500 rounded-full" />
+                  Personal Info
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input
+                      type="text"
+                      value={aiContext.name}
+                      onChange={e => updateAiContext({ name: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Role / Title</label>
+                    <input
+                      type="text"
+                      value={aiContext.role}
+                      onChange={e => updateAiContext({ role: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                    <input
+                      type="text"
+                      value={aiContext.location}
+                      onChange={e => updateAiContext({ location: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
+                    <input
+                      type="text"
+                      value={aiContext.yearsOfExperience}
+                      onChange={e => updateAiContext({ yearsOfExperience: e.target.value })}
+                      placeholder="e.g. 3+"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Availability</label>
+                    <input
+                      type="text"
+                      value={aiContext.availability}
+                      onChange={e => updateAiContext({ availability: e.target.value })}
+                      placeholder="e.g. Open to freelance and full-time"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Languages Spoken</label>
+                    <input
+                      type="text"
+                      value={aiContext.languages}
+                      onChange={e => updateAiContext({ languages: e.target.value })}
+                      placeholder="e.g. Indonesian (native), English (fluent)"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Bio / About Me</label>
+                    <textarea
+                      rows={4}
+                      value={aiContext.bio}
+                      onChange={e => updateAiContext({ bio: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact & Social Card */}
+              <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-cyan-500 rounded-full" />
+                  Contact & Social
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input
+                      type="email"
+                      value={aiContext.email}
+                      onChange={e => updateAiContext({ email: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                    <input
+                      type="text"
+                      value={aiContext.phone}
+                      onChange={e => updateAiContext({ phone: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn URL</label>
+                    <input
+                      type="url"
+                      value={aiContext.linkedin}
+                      onChange={e => updateAiContext({ linkedin: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">GitHub URL</label>
+                    <input
+                      type="url"
+                      value={aiContext.github}
+                      onChange={e => updateAiContext({ github: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Instagram URL</label>
+                    <input
+                      type="url"
+                      value={aiContext.instagram}
+                      onChange={e => updateAiContext({ instagram: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Skills & Interests Card */}
+              <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-amber-500 rounded-full" />
+                  Skills & Interests
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Technical Skills
+                      <span className="text-gray-400 font-normal ml-1">(comma-separated)</span>
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={aiContext.skills}
+                      onChange={e => updateAiContext({ skills: e.target.value })}
+                      placeholder="React, Node.js, TypeScript, ..."
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                    />
+                    {/* Preview pills */}
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {aiContext.skills.split(',').filter(s => s.trim()).slice(0, 8).map(skill => (
+                        <span key={skill} className="px-2 py-0.5 bg-orange-50 text-orange-600 text-xs rounded-full border border-orange-200">
+                          {skill.trim()}
+                        </span>
+                      ))}
+                      {aiContext.skills.split(',').filter(s => s.trim()).length > 8 && (
+                        <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded-full">
+                          +{aiContext.skills.split(',').filter(s => s.trim()).length - 8} more
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Interests
+                      <span className="text-gray-400 font-normal ml-1">(comma-separated)</span>
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={aiContext.interests}
+                      onChange={e => updateAiContext({ interests: e.target.value })}
+                      placeholder="Open source, Machine Learning, ..."
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Extra Notes Card */}
+              <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full" />
+                  Extra Notes for AI
+                </h3>
+                <p className="text-gray-500 text-sm mb-3">
+                  Anything else you want the AI to know — hobbies, fun facts, current projects, goals, etc.
+                </p>
+                <textarea
+                  rows={8}
+                  value={aiContext.extraNotes}
+                  onChange={e => updateAiContext({ extraNotes: e.target.value })}
+                  placeholder="e.g. Currently learning Rust. Loves badminton. Looking for remote opportunities in Europe. Working on a SaaS product for content creators..."
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                />
+
+                {/* Live data notice */}
+                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-xl flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-green-700 text-sm font-medium">Live data is also included automatically</p>
+                    <p className="text-green-600 text-xs mt-0.5">
+                      Your projects, education, and achievements from the other tabs are automatically injected into the AI's knowledge. No need to repeat them here.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Auto-save notice */}
+            <div className="mt-4 text-center text-gray-400 text-sm flex items-center justify-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-green-400" />
+              All changes are saved automatically to your browser. The AI chatbot will use this data immediately.
+            </div>
+          </div>
+        )}
       </main>
+
 
       {/* Modal */}
       {showModal && (

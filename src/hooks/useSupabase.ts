@@ -279,13 +279,13 @@ export const useAuth = () => {
     }
 
     // Supabase auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
     // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -327,3 +327,78 @@ export const useAuth = () => {
 
   return { user, loading, signIn, signOut };
 };
+
+// ─── Personal Context (AI Brain) ────────────────────────────────────────────
+
+export interface PersonalContext {
+  name: string;
+  role: string;
+  location: string;
+  bio: string;
+  email: string;
+  phone: string;
+  linkedin: string;
+  github: string;
+  instagram: string;
+  availability: string;
+  yearsOfExperience: string;
+  skills: string;        // comma-separated
+  interests: string;     // comma-separated
+  languages: string;     // e.g. "Indonesian (native), English (fluent)"
+  extraNotes: string;    // free-form extra info for the AI
+}
+
+const DEFAULT_CONTEXT: PersonalContext = {
+  name: 'Mumtaz Kholafiyan Alfan',
+  role: 'Full Stack Developer',
+  location: 'Yogyakarta, Indonesia',
+  bio: 'Passionate full-stack developer who loves building scalable web applications and creating exceptional digital experiences. Focused on clean code, modern technologies, and solving complex problems.',
+  email: 'hello@mumtaz.dev',
+  phone: '+62 812 3456 7890',
+  linkedin: 'https://linkedin.com/in/mumtazka',
+  github: 'https://github.com/mumtazka',
+  instagram: 'https://instagram.com/mumtazka',
+  availability: 'Open to freelance projects and full-time opportunities',
+  yearsOfExperience: '3+',
+  skills: 'React, Node.js, TypeScript, PostgreSQL, MongoDB, Tailwind CSS, Next.js, Python, Docker, Supabase, GraphQL, Redis, Vue.js, Express, Prisma, Firebase, Git, Figma, Linux, Nginx, Vite',
+  interests: 'Open source contribution, Machine Learning, Cloud Architecture, UI/UX Design',
+  languages: 'Indonesian (native), English (fluent)',
+  extraNotes: '',
+};
+
+const CONTEXT_STORAGE_KEY = 'portfolio_ai_context';
+
+export const usePersonalContext = () => {
+  const [context, setContext] = useState<PersonalContext>(() => {
+    try {
+      const stored = localStorage.getItem(CONTEXT_STORAGE_KEY);
+      if (stored) return { ...DEFAULT_CONTEXT, ...JSON.parse(stored) };
+    } catch { }
+    return DEFAULT_CONTEXT;
+  });
+
+  const updateContext = (updates: Partial<PersonalContext>) => {
+    setContext(prev => {
+      const next = { ...prev, ...updates };
+      localStorage.setItem(CONTEXT_STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const resetContext = () => {
+    localStorage.removeItem(CONTEXT_STORAGE_KEY);
+    setContext(DEFAULT_CONTEXT);
+  };
+
+  return { context, updateContext, resetContext };
+};
+
+// Helper to read context without React (used by AIChatbot at call time)
+export const getPersonalContext = (): PersonalContext => {
+  try {
+    const stored = localStorage.getItem(CONTEXT_STORAGE_KEY);
+    if (stored) return { ...DEFAULT_CONTEXT, ...JSON.parse(stored) };
+  } catch { }
+  return DEFAULT_CONTEXT;
+};
+
