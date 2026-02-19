@@ -1,6 +1,5 @@
 
 import AIChatbot from './components/AIChatbot';
-import Sidebar from './components/Sidebar';
 import Hero from './sections/Hero';
 import TechCarousel from './sections/TechCarousel';
 import Projects from './sections/Projects';
@@ -12,8 +11,7 @@ import Admin from './pages/Admin';
 function HomePage() {
   return (
     <>
-      <Sidebar />
-      <main className="w-full lg:pl-20 pb-16 lg:pb-0">
+      <main className="w-full">
         <Hero />
         <TechCarousel />
         <Projects />
