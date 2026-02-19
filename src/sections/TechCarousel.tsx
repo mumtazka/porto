@@ -211,9 +211,6 @@ export default function TechCarousel() {
           0% { transform: translateX(0); }
           100% { transform: translateX(-25%); }
         }
-        .marquee-track:hover {
-          animation-play-state: paused;
-        }
       `}</style>
     </section>
   );
