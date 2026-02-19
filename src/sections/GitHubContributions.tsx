@@ -332,78 +332,93 @@ export default function GitHubContributions() {
                                 </a>
                             </div>
 
-                            {/* Graph */}
-                            <div ref={graphRef} className="relative overflow-x-auto pb-2">
-                                {/* Month Labels */}
-                                <div className="flex mb-2 ml-8" style={{ gap: '0px' }}>
-                                    {monthPositions.map((pos, i) => (
-                                        <div
-                                            key={i}
-                                            className="text-xs text-gray-400 shrink-0"
-                                            style={{
-                                                width: i < monthPositions.length - 1
-                                                    ? `${(monthPositions[i + 1].index - pos.index) * 14}px`
-                                                    : 'auto',
-                                            }}
-                                        >
-                                            {pos.label}
-                                        </div>
-                                    ))}
-                                </div>
+                            {/* Graph + Mona */}
+                            <div className="flex gap-4 items-center">
 
-                                {/* Grid */}
-                                <div className="flex gap-0.5">
-                                    {/* Day Labels */}
-                                    <div className="flex flex-col gap-0.5 mr-1 shrink-0">
-                                        {DAY_LABELS.map((label, i) => (
-                                            <div key={i} className="h-[12px] flex items-center">
-                                                <span className="text-[10px] text-gray-400 w-6 text-right">{label}</span>
+                                {/* Graph */}
+                                <div ref={graphRef} className="relative overflow-x-auto pb-2 flex-1 min-w-0">
+                                    {/* Month Labels */}
+                                    <div className="flex mb-2 ml-8" style={{ gap: '0px' }}>
+                                        {monthPositions.map((pos, i) => (
+                                            <div
+                                                key={i}
+                                                className="text-xs text-gray-400 shrink-0"
+                                                style={{
+                                                    width: i < monthPositions.length - 1
+                                                        ? `${(monthPositions[i + 1].index - pos.index) * 14}px`
+                                                        : 'auto',
+                                                }}
+                                            >
+                                                {pos.label}
                                             </div>
                                         ))}
                                     </div>
 
-                                    {/* Contribution Cells */}
-                                    {contributionData.contributionCalendar.weeks.map((week, weekIndex) => (
-                                        <div key={weekIndex} className="flex flex-col gap-0.5">
-                                            {week.contributionDays.map((day, dayIndex) => (
-                                                <div
-                                                    key={dayIndex}
-                                                    className={`w-[12px] h-[12px] rounded-[3px] border transition-all duration-200 cursor-pointer hover:scale-150 hover:z-10 ${getContributionColor(day.contributionLevel, day.contributionCount)} ${getContributionBorder(day.contributionLevel, day.contributionCount)}`}
-                                                    onMouseEnter={(e) => handleDayHover(day, e)}
-                                                    onMouseLeave={() => setHoveredDay(null)}
-                                                    style={{
-                                                        animationDelay: `${weekIndex * 10}ms`,
-                                                    }}
-                                                />
+                                    {/* Grid */}
+                                    <div className="flex gap-0.5">
+                                        {/* Day Labels */}
+                                        <div className="flex flex-col gap-0.5 mr-1 shrink-0">
+                                            {DAY_LABELS.map((label, i) => (
+                                                <div key={i} className="h-[12px] flex items-center">
+                                                    <span className="text-[10px] text-gray-400 w-6 text-right">{label}</span>
+                                                </div>
                                             ))}
                                         </div>
-                                    ))}
+
+                                        {/* Contribution Cells */}
+                                        {contributionData.contributionCalendar.weeks.map((week, weekIndex) => (
+                                            <div key={weekIndex} className="flex flex-col gap-0.5">
+                                                {week.contributionDays.map((day, dayIndex) => (
+                                                    <div
+                                                        key={dayIndex}
+                                                        className={`w-[12px] h-[12px] rounded-[3px] border transition-all duration-200 cursor-pointer hover:scale-150 hover:z-10 ${getContributionColor(day.contributionLevel, day.contributionCount)} ${getContributionBorder(day.contributionLevel, day.contributionCount)}`}
+                                                        onMouseEnter={(e) => handleDayHover(day, e)}
+                                                        onMouseLeave={() => setHoveredDay(null)}
+                                                        style={{
+                                                            animationDelay: `${weekIndex * 10}ms`,
+                                                        }}
+                                                    />
+                                                ))}
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Tooltip */}
+                                    {hoveredDay && (
+                                        <div
+                                            className="absolute z-20 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg pointer-events-none whitespace-nowrap"
+                                            style={{
+                                                left: `${Math.min(hoveredDay.x, (graphRef.current?.clientWidth || 0) - 180)}px`,
+                                                top: `${hoveredDay.y - 45}px`,
+                                            }}
+                                        >
+                                            <p className="font-semibold">
+                                                {hoveredDay.day.contributionCount} contribution{hoveredDay.day.contributionCount !== 1 ? 's' : ''}
+                                            </p>
+                                            <p className="text-gray-400">
+                                                {new Date(hoveredDay.day.date).toLocaleDateString('en-US', {
+                                                    weekday: 'short',
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                    year: 'numeric',
+                                                })}
+                                            </p>
+                                            <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
+                                        </div>
+                                    )}
+                                </div>{/* end graph */}
+
+                                {/* Mona — GIF mascot */}
+                                <div className="hidden md:flex flex-col items-center justify-center shrink-0 select-none group/mona" style={{ width: 120 }}>
+                                    <img
+                                        src="/mona-loading-dark.gif"
+                                        alt="Mona Octocat"
+                                        className="w-20 h-20 object-contain transition-transform duration-500 group-hover/mona:scale-110"
+                                    />
+                                    <span className="text-[10px] text-gray-400 mt-2 tracking-wide font-medium">Mona</span>
                                 </div>
 
-                                {/* Tooltip */}
-                                {hoveredDay && (
-                                    <div
-                                        className="absolute z-20 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg pointer-events-none whitespace-nowrap"
-                                        style={{
-                                            left: `${Math.min(hoveredDay.x, (graphRef.current?.clientWidth || 0) - 180)}px`,
-                                            top: `${hoveredDay.y - 45}px`,
-                                        }}
-                                    >
-                                        <p className="font-semibold">
-                                            {hoveredDay.day.contributionCount} contribution{hoveredDay.day.contributionCount !== 1 ? 's' : ''}
-                                        </p>
-                                        <p className="text-gray-400">
-                                            {new Date(hoveredDay.day.date).toLocaleDateString('en-US', {
-                                                weekday: 'short',
-                                                month: 'short',
-                                                day: 'numeric',
-                                                year: 'numeric',
-                                            })}
-                                        </p>
-                                        <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
-                                    </div>
-                                )}
-                            </div>
+                            </div>{/* end flex row */}
 
                             {/* Legend */}
                             <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
