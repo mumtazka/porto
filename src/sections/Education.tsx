@@ -1,279 +1,280 @@
 import { useRef, useEffect, useState } from 'react';
-import { Calendar, Award, ExternalLink } from 'lucide-react';
-import { useEducation } from '../hooks/useSupabase';
+import { GraduationCap, Trophy, ExternalLink, Calendar } from 'lucide-react';
+import { useEducation, useAchievements } from '../hooks/useSupabase';
 
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+function formatYear(dateString: string): string {
+  return new Date(dateString).getFullYear().toString();
 }
 
-function EducationCard({ edu, index, isLeft }: { edu: any; index: number; isLeft: boolean }) {
-  const [isVisible, setIsVisible] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
+function formatDateShort(dateString: string): string {
+  return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+}
 
+function useReveal() {
+  const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.2 }
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold: 0.15 }
     );
-
-    if (cardRef.current) {
-      observer.observe(cardRef.current);
-    }
-
-    return () => observer.disconnect();
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
   }, []);
+  return { ref, visible };
+}
+
+/* ─── Education Entry ───────────────────────────────────────────────────── */
+function EduEntry({ edu, index }: { edu: any; index: number }) {
+  const { ref, visible } = useReveal();
+  const isEven = index % 2 === 0;
 
   return (
     <div
-      ref={cardRef}
-      className={`relative flex items-center justify-center transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-        }`}
-      style={{ transitionDelay: `${index * 200}ms` }}
+      ref={ref}
+      className="relative transition-all duration-700"
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(32px)',
+        transitionDelay: `${index * 120}ms`,
+      }}
     >
-      {/* Desktop Layout */}
-      <div className="hidden lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-8 items-center w-full">
-        {/* Left Side */}
-        <div className={`${isLeft ? 'text-right' : 'order-3 text-left'}`}>
-          {isLeft && (
-            <div
-              className="glass rounded-2xl p-6 card-hover cursor-pointer"
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
-              <div className="flex items-start gap-4 justify-end">
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">{edu.institution}</h3>
-                  <p className="text-orange-400 font-medium mb-2">{edu.degree}</p>
-                  <p className="text-gray-600 text-sm mb-3">{edu.field}</p>
-                  <div className="flex items-center gap-2 text-gray-500 text-sm justify-end">
-                    <Calendar className="w-4 h-4" />
-                    {formatDate(edu.start_date)} - {formatDate(edu.end_date)}
-                  </div>
-                  {edu.description && (
-                    <p className="text-gray-600 text-sm mt-3 line-clamp-2">{edu.description}</p>
-                  )}
-                </div>
-                <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 glass">
-                  <img
-                    src={edu.certificate_image || 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=100&h=100&fit=crop'}
-                    alt={edu.institution}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
-
-              {/* Border Glow */}
-              <div className={`absolute inset-0 rounded-2xl border-2 transition-all duration-300 pointer-events-none ${isHovered ? 'border-orange-500/50 glow-orange' : 'border-transparent'
-                }`} />
-            </div>
-          )}
+      {/* Row: number | connector | card */}
+      <div className="flex items-start gap-6 lg:gap-10">
+        {/* Big ordinal number */}
+        <div className="flex-shrink-0 w-14 lg:w-20 text-right">
+          <span
+            className="font-display font-extrabold text-5xl lg:text-7xl leading-none select-none"
+            style={{ color: 'rgba(20,20,20,0.07)', letterSpacing: '-0.04em' }}
+          >
+            {String(index + 1).padStart(2, '0')}
+          </span>
         </div>
 
-        {/* Center Timeline */}
-        <div className="relative flex flex-col items-center">
-          <div className="w-4 h-4 rounded-full bg-orange-500 z-10" />
-          <div className="w-0.5 h-full bg-gradient-to-b from-orange-500 to-transparent absolute top-4" />
+        {/* Vertical line + dot */}
+        <div className="flex flex-col items-center pt-2 flex-shrink-0">
+          <div className="w-3 h-3 rounded-full bg-stone-800 ring-4 ring-stone-800/10 z-10" />
+          <div className="w-px flex-1 bg-stone-200 mt-2" style={{ minHeight: 60 }} />
         </div>
 
-        {/* Right Side */}
-        <div className={`${!isLeft ? 'text-left' : 'order-1 text-right'}`}>
-          {!isLeft && (
-            <div
-              className="relative glass rounded-2xl p-6 card-hover cursor-pointer"
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 glass">
-                  <img
-                    src={edu.certificate_image || 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=100&h=100&fit=crop'}
-                    alt={edu.institution}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">{edu.institution}</h3>
-                  <p className="text-orange-400 font-medium mb-2">{edu.degree}</p>
-                  <p className="text-gray-600 text-sm mb-3">{edu.field}</p>
-                  <div className="flex items-center gap-2 text-gray-500 text-sm">
-                    <Calendar className="w-4 h-4" />
-                    {formatDate(edu.start_date)} - {formatDate(edu.end_date)}
-                  </div>
-                  {edu.description && (
-                    <p className="text-gray-600 text-sm mt-3 line-clamp-2">{edu.description}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Border Glow */}
-              <div className={`absolute inset-0 rounded-2xl border-2 transition-all duration-300 pointer-events-none ${isHovered ? 'border-orange-500/50 glow-orange' : 'border-transparent'
-                }`} />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Mobile/Tablet Layout */}
-      <div className="lg:hidden w-full">
-        <div
-          className="relative glass rounded-2xl p-5 card-hover"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          <div className="flex items-start gap-4">
-            {/* Timeline Dot */}
-            <div className="flex flex-col items-center">
-              <div className="w-3 h-3 rounded-full bg-orange-500" />
-              <div className="w-0.5 flex-1 bg-gradient-to-b from-orange-500 to-transparent mt-2" />
+        {/* Card */}
+        <div className="flex-1 pb-10 group">
+          <div
+            className="rounded-2xl border border-stone-200 bg-white/60 backdrop-blur-sm p-6 lg:p-8 transition-all duration-300 hover:border-stone-400 hover:shadow-sm"
+          >
+            {/* Date badge */}
+            <div className="flex items-center gap-1.5 mb-3">
+              <Calendar className="w-3 h-3 text-stone-400" />
+              <span className="text-xs font-medium text-stone-400 tracking-wide uppercase">
+                {formatDateShort(edu.start_date)} — {formatDateShort(edu.end_date)}
+              </span>
             </div>
 
-            <div className="flex-1 pb-6">
-              <div className="flex items-start gap-3 mb-3">
-                <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 glass">
-                  <img
-                    src={edu.certificate_image || 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=100&h=100&fit=crop'}
-                    alt={edu.institution}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900">{edu.institution}</h3>
-                  <div className="flex items-center gap-2 text-gray-500 text-xs mt-1">
-                    <Calendar className="w-3 h-3" />
-                    {formatDate(edu.start_date)} - {formatDate(edu.end_date)}
-                  </div>
-                </div>
-              </div>
+            {/* Institution */}
+            <h3 className="font-display font-bold text-xl lg:text-2xl text-stone-900 mb-1" style={{ letterSpacing: '-0.02em' }}>
+              {edu.institution}
+            </h3>
 
-              <p className="text-orange-400 font-medium mb-1">{edu.degree}</p>
-              <p className="text-gray-600 text-sm mb-2">{edu.field}</p>
-
-              {edu.description && (
-                <p className="text-gray-500 text-sm line-clamp-2">{edu.description}</p>
+            {/* Degree tag */}
+            <div className="inline-flex items-center gap-2 mb-3">
+              <span className="text-sm font-medium text-orange-500">{edu.degree}</span>
+              {edu.field && (
+                <>
+                  <span className="text-stone-300">·</span>
+                  <span className="text-sm text-stone-500">{edu.field}</span>
+                </>
               )}
             </div>
-          </div>
 
-          {/* Border Glow */}
-          <div className={`absolute inset-0 rounded-2xl border-2 transition-all duration-300 pointer-events-none ${isHovered ? 'border-orange-500/50 glow-orange' : 'border-transparent'
-            }`} />
+            {/* Description */}
+            {edu.description && (
+              <p className="text-stone-500 text-sm leading-relaxed mt-2 line-clamp-2">{edu.description}</p>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-export default function Education() {
-  const { education, loading } = useEducation();
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+/* ─── Achievement Card ──────────────────────────────────────────────────── */
+function AchievementCard({ ach, index }: { ach: any; index: number }) {
+  const { ref, visible } = useReveal();
 
   return (
-    <section
-      ref={sectionRef}
-      id="education"
-      className="relative py-20 bg-charcoal overflow-hidden"
+    <div
+      ref={ref}
+      className="transition-all duration-600"
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(24px)',
+        transitionDelay: `${index * 80}ms`,
+      }}
     >
-      {/* Background */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-1/3 w-96 h-96 bg-cyan-500/5 rounded-full blur-[100px]" />
-        <div className="absolute bottom-0 right-1/3 w-80 h-80 bg-orange-500/5 rounded-full blur-[80px]" />
-      </div>
+      <div className="group relative rounded-2xl border border-stone-200 bg-white/60 backdrop-blur-sm p-5 h-full flex flex-col gap-4 transition-all duration-300 hover:border-stone-900 hover:-translate-y-1 hover:shadow-md">
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 lg:pl-28">
-        {/* Section Header */}
-        <div className={`text-center mb-16 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        {/* Top row: year + link */}
+        <div className="flex items-center justify-between">
+          <span className="font-display font-bold text-xs tracking-widest text-stone-400 uppercase">
+            {formatYear(ach.date)}
+          </span>
+          {ach.credential_url && (
+            <a
+              href={ach.credential_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-1.5 rounded-lg text-stone-400 hover:text-stone-900 hover:bg-stone-100 transition-colors"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          )}
+        </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-            Education & <span className="text-gradient">Achievements</span>
-          </h2>
-          <div className="flex items-center justify-center gap-4">
-            <div className="h-px w-12 bg-gradient-to-r from-transparent to-orange-500" />
-            <p className="text-gray-600 max-w-xl">
-              My academic background and professional certifications that shaped my expertise.
-            </p>
-            <div className="h-px w-12 bg-gradient-to-l from-transparent to-orange-500" />
+        {/* Trophy icon + title */}
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0 group-hover:bg-amber-100 transition-colors">
+            <Trophy className="w-4 h-4 text-amber-500" />
+          </div>
+          <div>
+            <h4 className="font-display font-bold text-stone-900 text-sm leading-snug" style={{ letterSpacing: '-0.015em' }}>
+              {ach.title}
+            </h4>
+            <p className="text-xs text-stone-400 mt-0.5">{ach.issuer}</p>
           </div>
         </div>
 
-        {/* Loading State */}
-        {loading && (
-          <div className="space-y-6">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="glass rounded-2xl p-6 animate-pulse">
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 bg-white/5 rounded-xl" />
-                  <div className="flex-1 space-y-3">
-                    <div className="h-6 bg-white/5 rounded w-1/3" />
-                    <div className="h-4 bg-white/5 rounded w-1/4" />
-                    <div className="h-4 bg-white/5 rounded w-1/2" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* Optional description */}
+        {ach.description && (
+          <p className="text-xs text-stone-500 leading-relaxed line-clamp-2 mt-auto">{ach.description}</p>
         )}
 
-        {/* Education Timeline */}
-        {!loading && education.length > 0 && (
-          <div className="space-y-0 lg:space-y-8">
-            {education.map((edu, index) => (
-              <EducationCard
-                key={edu.id}
-                edu={edu}
-                index={index}
-                isLeft={index % 2 === 0}
-              />
-            ))}
-          </div>
-        )}
+        {/* Bottom accent line on hover */}
+        <div className="absolute bottom-0 left-5 right-5 h-px bg-stone-900 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-full" />
+      </div>
+    </div>
+  );
+}
 
-        {/* Certifications CTA */}
-        {!loading && (
-          <div className={`mt-16 text-center transition-all duration-700 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <div className="inline-flex items-center gap-4 glass rounded-2xl p-6">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
-                <Award className="w-6 h-6 text-white" />
-              </div>
-              <div className="text-left">
-                <h4 className="text-gray-900 font-semibold">View All Certifications</h4>
-                <p className="text-gray-600 text-sm">Check out my complete credential portfolio</p>
-              </div>
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-3 glass rounded-xl text-orange-400 hover:bg-orange-500 hover:text-white transition-all duration-300"
-              >
-                <ExternalLink className="w-5 h-5" />
-              </a>
+/* ─── Loading skeleton ─────────────────────────────────────────────────── */
+function SkeletonRow() {
+  return (
+    <div className="flex items-start gap-6 lg:gap-10 animate-pulse">
+      <div className="w-14 lg:w-20 h-16 bg-stone-100 rounded-lg flex-shrink-0" />
+      <div className="flex flex-col items-center pt-2 flex-shrink-0">
+        <div className="w-3 h-3 rounded-full bg-stone-200" />
+        <div className="w-px h-16 bg-stone-100 mt-2" />
+      </div>
+      <div className="flex-1 pb-10">
+        <div className="rounded-2xl border border-stone-100 bg-stone-50 p-6 space-y-3">
+          <div className="h-3 bg-stone-100 rounded w-24" />
+          <div className="h-6 bg-stone-100 rounded w-2/3" />
+          <div className="h-4 bg-stone-100 rounded w-1/3" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main Section ─────────────────────────────────────────────────────── */
+export default function Education() {
+  const { education, loading: eduLoading } = useEducation();
+  const { achievements, loading: achLoading } = useAchievements();
+
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [headerVisible, setHeaderVisible] = useState(false);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setHeaderVisible(true); obs.disconnect(); } },
+      { threshold: 0.1 }
+    );
+    if (headerRef.current) obs.observe(headerRef.current);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <section id="education" className="relative py-24 overflow-hidden" style={{ background: '#f0ede5' }}>
+
+      {/* Faint background texture circles */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-orange-100/40 blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-amber-100/30 blur-3xl" />
+      </div>
+
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 lg:pl-28">
+
+        {/* ── Section Header ───────────────────────────────────────── */}
+        <div
+          ref={headerRef}
+          className="mb-20 transition-all duration-700"
+          style={{ opacity: headerVisible ? 1 : 0, transform: headerVisible ? 'none' : 'translateY(24px)' }}
+        >
+          <p className="text-xs font-semibold tracking-[0.2em] uppercase text-stone-400 mb-3">Background</p>
+          <h2
+            className="font-display font-extrabold text-stone-900"
+            style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', lineHeight: 1, letterSpacing: '-0.04em' }}
+          >
+            Education &<br />
+            <span className="text-orange-400">Achievements.</span>
+          </h2>
+          <p className="mt-5 text-stone-500 max-w-md leading-relaxed">
+            A snapshot of my academic journey and the credentials I've earned along the way.
+          </p>
+        </div>
+
+        {/* ── Education Timeline ───────────────────────────────────── */}
+        <div className="mb-24">
+          <div className="flex items-center gap-3 mb-10">
+            <div className="w-8 h-8 rounded-xl bg-stone-900 flex items-center justify-center">
+              <GraduationCap className="w-4 h-4 text-white" />
             </div>
+            <h3 className="font-display font-bold text-stone-900 text-lg" style={{ letterSpacing: '-0.02em' }}>
+              Education
+            </h3>
           </div>
-        )}
+
+          <div>
+            {eduLoading ? (
+              <div className="space-y-0">
+                {[0, 1, 2].map(i => <SkeletonRow key={i} />)}
+              </div>
+            ) : education.length === 0 ? (
+              <p className="text-stone-400 text-sm pl-4">No education entries yet.</p>
+            ) : (
+              education.map((edu, i) => <EduEntry key={edu.id} edu={edu} index={i} />)
+            )}
+          </div>
+        </div>
+
+        {/* ── Achievements Grid ─────────────────────────────────────── */}
+        <div>
+          <div className="flex items-center gap-3 mb-10">
+            <div className="w-8 h-8 rounded-xl bg-amber-400 flex items-center justify-center">
+              <Trophy className="w-4 h-4 text-white" />
+            </div>
+            <h3 className="font-display font-bold text-stone-900 text-lg" style={{ letterSpacing: '-0.02em' }}>
+              Certifications & Awards
+            </h3>
+          </div>
+
+          {achLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
+              {[0, 1, 2, 3].map(i => (
+                <div key={i} className="rounded-2xl border border-stone-100 bg-stone-50 h-36" />
+              ))}
+            </div>
+          ) : achievements.length === 0 ? (
+            <p className="text-stone-400 text-sm pl-4">No achievements listed yet.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {achievements.map((ach, i) => (
+                <AchievementCard key={ach.id} ach={ach} index={i} />
+              ))}
+            </div>
+          )}
+        </div>
+
       </div>
     </section>
   );
