@@ -4,35 +4,38 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
+    --background: 30 27% 92%;
+    --foreground: 0 0% 8%;
+    --card: 30 27% 94%;
+    --card-foreground: 0 0% 8%;
+    --popover: 30 27% 94%;
+    --popover-foreground: 0 0% 8%;
     --primary: 24 95% 53%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
+    --secondary: 30 20% 88%;
     --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
+    --muted: 30 20% 88%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 30 20% 88%;
     --accent-foreground: 0 0% 9%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
+    --border: 30 15% 82%;
+    --input: 30 15% 82%;
     --ring: 24 95% 53%;
     --radius: 0.625rem;
 
     /* Custom Colors */
-    --charcoal: #ffffff;
-    --charcoal-light: #f3f4f6;
+    --cream: #f0ede5;
+    --cream-light: #f6f4ef;
+    --cream-dark: #e8e4da;
+    --charcoal: #f0ede5;
+    --charcoal-light: #f6f4ef;
     --orange: #F97316;
     --amber: #FBBF24;
     --cyan: #06B6D4;
-    --white: #000000;
-    --gray: #4b5563;
+    --white: #141414;
+    --gray: #5a5a5a;
   }
 }
 
@@ -46,8 +49,21 @@
   }
 
   body {
-    @apply bg-white text-gray-900 antialiased;
+    background-color: #f0ede5;
+    color: #141414;
+    @apply antialiased;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.03em;
   }
 }
 
@@ -294,20 +310,20 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #1A1A1A;
+  background: #e8e4da;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #F97316;
+  background: #c5bfb3;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #EA580C;
+  background: #a09a90;
 }
 
 /* Selection Styling */
 ::selection {
-  background: rgba(249, 115, 22, 0.3);
-  color: white;
+  background: rgba(20, 20, 20, 0.15);
+  color: #141414;
 }
