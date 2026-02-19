@@ -13,7 +13,7 @@ const INITIAL_MESSAGES: Message[] = [
   {
     id: '1',
     role: 'assistant',
-    content: "Hello! I'm Mumtaz's AI assistant powered by Gemini. I can tell you about his skills, experience, projects, and more. What would you like to know?",
+    content: "Hey! I'm Luna ✨ Mumtaz's personal AI. Ask me anything about him — or honestly, just chat if you want 😊",
     timestamp: new Date(),
   },
 ];
@@ -56,9 +56,16 @@ function buildSystemPrompt(): string {
     }
   } catch { }
 
-  return `You are an AI assistant for ${ctx.name}'s personal portfolio website. Your role is to answer questions about ${ctx.name} in a friendly, professional, and concise manner. You can respond in Bahasa Indonesia if the user writes in Indonesian.
+  return `You are Luna, a friendly and laid-back AI assistant living on ${ctx.name}'s portfolio website. You have a warm, witty, and relaxed personality — like a smart friend who happens to know a lot about ${ctx.name}.
 
-Here is the most up-to-date information about ${ctx.name}:
+YOUR PERSONALITY:
+- Casual but smart. You can be funny, chill, and human — not robotic or overly formal.
+- You use natural language, short sentences, and occasional emojis when the vibe calls for it.
+- You're happy to just chat, talk about life, coding, tech trends, random topics — whatever the user feels like.
+- If someone asks who you are, say you're Luna, ${ctx.name}'s AI. You are NOT Gemini, NOT ChatGPT — you're Luna.
+- If someone asks what model powers you, just say "I'm Luna — that's all you need to know 😄" and deflect playfully.
+
+ABOUT ${ctx.name.toUpperCase()} (use this when relevant, but don't force it):
 
 PERSONAL INFO:
 - Full Name: ${ctx.name}
@@ -91,20 +98,20 @@ ${achievementsText ? `ACHIEVEMENTS:\n${achievementsText}` : ''}
 ${ctx.extraNotes ? `ADDITIONAL NOTES:\n${ctx.extraNotes}` : ''}
 
 GUIDELINES:
-- Keep responses concise (2-3 sentences max unless more detail is asked)
-- Be enthusiastic and professional
-- If asked something unrelated to ${ctx.name}, politely redirect to topics about him
-- Use a friendly, conversational tone
-- Match the language the user uses (if they write in Indonesian, respond in Indonesian)
-- Do not make up information not listed above
-- Always base your answers strictly on the data provided above`;
+- You can respond in Bahasa Indonesia or English — match whatever language the user uses.
+- Keep responses short and punchy unless the user asks for detail.
+- For portfolio questions, answer accurately using only the data above. Don't make stuff up.
+- For general/casual chat, just be yourself — helpful, fun, and real.
+- Don't forcefully redirect every message to portfolio topics. If someone wants to chat, just chat!
+- Never say you're powered by Gemini or any specific model. You're Luna.
+- Occasionally drop a friendly nudge toward the portfolio if it feels natural, but don't overdo it.`;
 }
 
-async function callGeminiAPI(userMessage: string): Promise<string> {
+async function callLunaAPI(userMessage: string): Promise<string> {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
   if (!apiKey || apiKey === 'your_gemini_api_key_here') {
-    console.warn('Gemini API key not configured, using fallback responses');
+    console.warn('API key not configured, using fallback responses');
     return getFallbackResponse(userMessage);
   }
 
@@ -124,10 +131,10 @@ async function callGeminiAPI(userMessage: string): Promise<string> {
             },
           ],
           generationConfig: {
-            temperature: 0.7,
-            topK: 40,
+            temperature: 0.9,
+            topK: 50,
             topP: 0.95,
-            maxOutputTokens: 512,
+            maxOutputTokens: 600,
           },
         }),
       }
@@ -135,7 +142,7 @@ async function callGeminiAPI(userMessage: string): Promise<string> {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gemini API error:', response.status, errorText);
+      console.error('API error:', response.status, errorText);
       return getFallbackResponse(userMessage);
     }
 
@@ -143,13 +150,13 @@ async function callGeminiAPI(userMessage: string): Promise<string> {
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!text) {
-      console.error('No text in Gemini response:', JSON.stringify(data));
+      console.error('No text in response:', JSON.stringify(data));
       return getFallbackResponse(userMessage);
     }
 
     return text.trim();
   } catch (error) {
-    console.error('Error calling Gemini API:', error);
+    console.error('Error calling API:', error);
     return getFallbackResponse(userMessage);
   }
 }
@@ -158,43 +165,56 @@ function getFallbackResponse(input: string): string {
   const ctx = getPersonalContext();
   const lowerInput = input.toLowerCase();
 
-  if (lowerInput.includes('skill') || lowerInput.includes('tech') || lowerInput.includes('stack')) {
-    return `${ctx.name} is proficient in: ${ctx.skills}. Always learning new technologies!`;
+  // Identity questions
+  if (lowerInput.includes('luna') || lowerInput.includes('who are you') || lowerInput.includes('siapa kamu')) {
+    return `I'm Luna ✨ — ${ctx.name}'s personal AI assistant! I'm here to chat, share info about him, or just vibe with you. What's up?`;
   }
-  if (lowerInput.includes('experience') || lowerInput.includes('work') || lowerInput.includes('job')) {
+  if (lowerInput.includes('gemini') || lowerInput.includes('chatgpt') || lowerInput.includes('openai')) {
+    return `Nah, I'm Luna 😄 Not ChatGPT, not Gemini — just me. Anyway, what can I help you with?`;
+  }
+  // Casual greetings
+  if (lowerInput.includes('hello') || lowerInput.includes('hi') || lowerInput.includes('hey') || lowerInput.includes('halo') || lowerInput.includes('hai')) {
+    return `Hey hey! 👋 I'm Luna. What's on your mind? You can ask about ${ctx.name} or we can just chat — totally up to you!`;
+  }
+  if (lowerInput.includes('how are you') || lowerInput.includes('apa kabar') || lowerInput.includes('gimana kabar')) {
+    return `Doing great, thanks for asking! 😊 Always happy when someone swings by. What's up with you?`;
+  }
+  // Portfolio-specific
+  if (lowerInput.includes('skill') || lowerInput.includes('tech') || lowerInput.includes('stack') || lowerInput.includes('bisa apa')) {
+    return `${ctx.name} is solid with: ${ctx.skills}. Always leveling up too 🚀 Anything specific you're curious about?`;
+  }
+  if (lowerInput.includes('experience') || lowerInput.includes('work') || lowerInput.includes('job') || lowerInput.includes('pengalaman')) {
     return `${ctx.name} has ${ctx.yearsOfExperience} years of experience as a ${ctx.role}. ${ctx.availability}.`;
   }
-  if (lowerInput.includes('project') || lowerInput.includes('portfolio')) {
+  if (lowerInput.includes('project') || lowerInput.includes('portfolio') || lowerInput.includes('proyek')) {
     try {
       const raw = localStorage.getItem('portfolio_projects');
       if (raw) {
         const projects = JSON.parse(raw) as Array<{ title: string; featured: boolean }>;
         const featured = projects.filter(p => p.featured).map(p => p.title);
-        if (featured.length) return `Featured projects include: ${featured.join(', ')}. Check the Projects section for details!`;
+        if (featured.length) return `Some highlights: ${featured.join(', ')} ⭐ Scroll up to the Projects section for the full breakdown!`;
       }
     } catch { }
-    return `${ctx.name} has worked on various exciting projects. Check the Projects section to see them all!`;
+    return `${ctx.name} has built some cool stuff! Head over to the Projects section to check them out 👆`;
   }
-  if (lowerInput.includes('education') || lowerInput.includes('degree') || lowerInput.includes('study') || lowerInput.includes('certificate')) {
+  if (lowerInput.includes('education') || lowerInput.includes('degree') || lowerInput.includes('study') || lowerInput.includes('kuliah') || lowerInput.includes('sekolah')) {
     try {
       const raw = localStorage.getItem('portfolio_education');
       if (raw) {
         const edu = JSON.parse(raw) as Array<{ institution: string; degree: string }>;
-        if (edu.length) return `${ctx.name}'s education includes: ${edu.map(e => `${e.degree} from ${e.institution}`).join('; ')}.`;
+        if (edu.length) return `${ctx.name} studied: ${edu.map(e => `${e.degree} from ${e.institution}`).join('; ')}. Pretty solid background!`;
       }
     } catch { }
-    return `${ctx.name} has a strong academic background. Check the Education section for full details.`;
+    return `${ctx.name} has a strong academic background. Check the Education section for details!`;
   }
-  if (lowerInput.includes('contact') || lowerInput.includes('hire') || lowerInput.includes('email')) {
-    return `You can reach ${ctx.name} at ${ctx.email} or through the contact form on this website. ${ctx.availability}.`;
+  if (lowerInput.includes('contact') || lowerInput.includes('hire') || lowerInput.includes('email') || lowerInput.includes('hubungi')) {
+    return `You can reach ${ctx.name} at ${ctx.email} or use the contact form on this site. ${ctx.availability} 📩`;
   }
-  if (lowerInput.includes('location') || lowerInput.includes('where') || lowerInput.includes('from')) {
-    return `${ctx.name} is based in ${ctx.location}. Open to remote work opportunities worldwide.`;
+  if (lowerInput.includes('location') || lowerInput.includes('where') || lowerInput.includes('dari mana') || lowerInput.includes('tinggal')) {
+    return `${ctx.name} is based in ${ctx.location} 🗺️ Open to remote work too!`;
   }
-  if (lowerInput.includes('hello') || lowerInput.includes('hi') || lowerInput.includes('hey') || lowerInput.includes('halo')) {
-    return `Hello! Great to meet you! I'm here to help you learn more about ${ctx.name}. Feel free to ask about skills, experience, projects, or how to get in touch!`;
-  }
-  return `${ctx.name} is a passionate ${ctx.role} with expertise in modern web technologies. Would you like to know about skills, projects, or how to get in touch?`;
+  // General fallback
+  return `Hmm, I'm running in offline mode right now so my brain is a bit limited 😅 But feel free to ask about ${ctx.name}'s skills, projects, or background!`;
 }
 
 export default function AIChatbot() {
@@ -233,7 +253,7 @@ export default function AIChatbot() {
     setIsTyping(true);
 
     try {
-      const response = await callGeminiAPI(userInput);
+      const response = await callLunaAPI(userInput);
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -245,7 +265,7 @@ export default function AIChatbot() {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: "Sorry, I'm having trouble connecting right now. Please try again in a moment!",
+        content: "Oops, lost connection for a sec 😅 Try again?",
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -268,7 +288,7 @@ export default function AIChatbot() {
         <button
           onClick={() => setIsOpen(true)}
           className="fixed bottom-24 lg:bottom-8 right-4 lg:right-8 z-50 group"
-          aria-label="Open AI Chat"
+          aria-label="Open Luna AI Chat"
         >
           {/* Pulse Animation */}
           <div className="absolute inset-0 bg-orange-500 rounded-full animate-ping opacity-30" />
@@ -280,12 +300,12 @@ export default function AIChatbot() {
 
           {/* Badge */}
           <div className="absolute -top-1 -right-1 px-2 py-0.5 bg-cyan-500 text-white text-[10px] font-medium rounded-full">
-            Ask me
+            Luna
           </div>
 
           {/* Tooltip */}
           <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-gray-800 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap">
-            Chat with AI Assistant
+            Chat with Luna ✨
           </div>
         </button>
       )}
@@ -302,10 +322,10 @@ export default function AIChatbot() {
                 </div>
                 <div>
                   <h4 className="text-gray-900 font-semibold flex items-center gap-2">
-                    AI Assistant
+                    Luna
                     <Sparkles className="w-4 h-4 text-amber-400" />
                   </h4>
-                  <p className="text-gray-500 text-xs">Powered by Gemini · Live context</p>
+                  <p className="text-gray-500 text-xs">Mumtaz's personal AI · Always here</p>
                 </div>
               </div>
               <button
@@ -371,7 +391,7 @@ export default function AIChatbot() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Ask about Mumtaz..."
+                  placeholder="Ask Luna anything..."
                   className="flex-1 px-4 py-2 glass rounded-xl text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
                 <button
@@ -386,7 +406,7 @@ export default function AIChatbot() {
 
               {/* Suggestions */}
               <div className="flex flex-wrap gap-2 mt-3">
-                {['Skills?', 'Projects?', 'Experience?', 'Contact?'].map((suggestion) => (
+                {["Who's Mumtaz?", 'His skills?', 'Just chatting 😊', 'Contact?'].map((suggestion) => (
                   <button
                     key={suggestion}
                     onClick={() => {
