@@ -1,6 +1,10 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { supabase } from '../utils/supabaseClient';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface TechItem {
   id: number;
@@ -121,6 +125,7 @@ function getLogoForTech(name: string): React.ReactNode | null {
 export default function TechCarousel() {
   const [techStack, setTechStack] = useState<TechItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const trackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchTechStack();
@@ -144,6 +149,53 @@ export default function TechCarousel() {
       setLoading(false);
     }
   };
+
+  // ── GSAP scroll-direction carousel ────────────────────────────────
+  useEffect(() => {
+    if (!trackRef.current || techStack.length === 0) return;
+
+    const track = trackRef.current;
+    const totalWidth = track.scrollWidth / 2; // 2 of 4 copies
+
+    const BASE = 1.2;   // px/frame leftward at rest
+    const BOOST = 3.5;  // multiplier when scrolling
+
+    // "locked" speed — stays at whatever direction was last set
+    let lockedSpeed = BASE;
+    let speed = BASE;
+    let xPos = 0;
+
+    const st = ScrollTrigger.create({
+      start: 0,
+      end: 'max',
+      onUpdate(self) {
+        // direction 1 = down → move left (positive BASE)
+        // direction -1 = up  → move right (negative BASE)
+        lockedSpeed = self.direction === 1 ? BASE * BOOST : -(BASE * BOOST);
+      },
+    });
+
+    const tick = () => {
+      // Smoothly ease into the locked speed — no automatic decay back
+      speed += (lockedSpeed - speed) * 0.07;
+
+      xPos -= speed;
+
+      // Seamless infinite wrap
+      if (xPos <= -totalWidth) xPos += totalWidth;
+      if (xPos > 0) xPos -= totalWidth;
+
+      gsap.set(track, { x: xPos });
+    };
+
+    gsap.ticker.add(tick);
+    gsap.ticker.lagSmoothing(0);
+
+    return () => {
+      gsap.ticker.remove(tick);
+      st.kill();
+    };
+  }, [techStack]);
 
   if (loading) {
     return (
@@ -170,8 +222,8 @@ export default function TechCarousel() {
       <div className="absolute inset-y-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-[#e8e4da] to-transparent z-10 pointer-events-none" />
       <div className="absolute inset-y-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-[#e8e4da] to-transparent z-10 pointer-events-none" />
 
-      {/* Marquee track */}
-      <div className="flex marquee-track">
+      {/* Marquee track — driven entirely by GSAP ticker */}
+      <div ref={trackRef} className="flex will-change-transform" style={{ width: 'max-content' }}>
         {items.map((tech, index) => {
           const logo = getLogoForTech(tech.name);
           return (
@@ -202,17 +254,6 @@ export default function TechCarousel() {
           );
         })}
       </div>
-
-      <style>{`
-        .marquee-track {
-          animation: marquee-scroll 30s linear infinite;
-          width: max-content;
-        }
-        @keyframes marquee-scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-25%); }
-        }
-      `}</style>
     </section>
   );
 }
