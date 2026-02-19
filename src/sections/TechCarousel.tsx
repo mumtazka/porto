@@ -157,8 +157,8 @@ export default function TechCarousel() {
     const track = trackRef.current;
     const totalWidth = track.scrollWidth / 2; // 2 of 4 copies
 
-    const BASE = 1.2;   // px/frame leftward at rest
-    const BOOST = 3.5;  // multiplier when scrolling
+    const BASE = 0.5;   // px/frame leftward at rest  ← slower idle
+    const BOOST = 2.0;  // multiplier when scrolling   ← gentler boost
 
     // "locked" speed — stays at whatever direction was last set
     let lockedSpeed = BASE;
@@ -177,7 +177,7 @@ export default function TechCarousel() {
 
     const tick = () => {
       // Smoothly ease into the locked speed — no automatic decay back
-      speed += (lockedSpeed - speed) * 0.07;
+      speed += (lockedSpeed - speed) * 0.03;
 
       xPos -= speed;
 
