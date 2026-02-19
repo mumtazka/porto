@@ -147,7 +147,7 @@ export default function TechCarousel() {
 
   if (loading) {
     return (
-      <section className="py-12 bg-[#0a0a0a] flex justify-center items-center">
+      <section className="py-12 bg-[#e8e4da] flex justify-center items-center">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-600" />
       </section>
     );
@@ -159,16 +159,16 @@ export default function TechCarousel() {
   const items = [...techStack, ...techStack, ...techStack, ...techStack];
 
   return (
-    <section id="skills" className="relative py-10 bg-[#0a0a0a] overflow-hidden">
+    <section id="skills" className="relative py-10 bg-[#e8e4da] overflow-hidden">
       {/* Very subtle top/bottom gradient fade */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-800 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-800 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-stone-300 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-stone-300 to-transparent" />
       </div>
 
       {/* Left/right edge fades */}
-      <div className="absolute inset-y-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
-      <div className="absolute inset-y-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-y-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-[#e8e4da] to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-[#e8e4da] to-transparent z-10 pointer-events-none" />
 
       {/* Marquee track */}
       <div className="flex marquee-track">
@@ -180,12 +180,12 @@ export default function TechCarousel() {
               className="flex items-center gap-3 px-8 sm:px-12 flex-shrink-0"
             >
               {logo ? (
-                <span className="text-gray-500">{logo}</span>
+                <span className="text-stone-500">{logo}</span>
               ) : (
                 /* Fallback: use the SVG path from DB */
                 <svg
                   viewBox="0 0 24 24"
-                  className="h-7 w-7 text-gray-500"
+                  className="h-7 w-7 text-stone-500"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="1.5"
@@ -195,7 +195,7 @@ export default function TechCarousel() {
                   <path d={tech.path} />
                 </svg>
               )}
-              <span className="text-gray-500 text-sm sm:text-base font-medium whitespace-nowrap">
+              <span className="text-stone-500 text-sm sm:text-base font-medium whitespace-nowrap">
                 {tech.name}
               </span>
             </div>
