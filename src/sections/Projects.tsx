@@ -111,6 +111,7 @@ function FeaturedProjectCard({ project, onClick }: { project: Project; onClick: 
     <div
       className="flex-shrink-0 w-[400px] h-[550px] relative group cursor-pointer overflow-hidden rounded-3xl glass-strong border border-white/40 shadow-xl transition-all duration-500 hover:shadow-2xl hover:-translate-y-2"
       onClick={onClick}
+      data-cursor="view"
     >
       {/* Image Half */}
       <div className="h-1/2 overflow-hidden relative">

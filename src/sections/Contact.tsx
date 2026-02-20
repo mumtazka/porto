@@ -198,6 +198,7 @@ export default function Contact() {
                       rel="noopener noreferrer"
                       className={`group p-3 glass rounded-xl text-gray-600 transition-all duration-300 ${social.color} hover:text-white hover:scale-110`}
                       aria-label={social.label}
+                      data-cursor={social.label}
                     >
                       <Icon className="w-5 h-5" />
                     </a>
@@ -278,6 +279,7 @@ export default function Contact() {
                     type="submit"
                     disabled={loading}
                     className="w-full btn-primary flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                    data-cursor="send"
                   >
                     {loading ? (
                       <>

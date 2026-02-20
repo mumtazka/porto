@@ -89,11 +89,12 @@ export default function Hero() {
               <button
                 onClick={scrollToProjects}
                 className="group btn-primary flex items-center gap-2"
+                data-cursor="explore"
               >
                 See My Work
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
-              <button className="btn-outline flex items-center gap-2">
+              <button className="btn-outline flex items-center gap-2" data-cursor="download">
                 <Download className="w-4 h-4" />
                 Resume
               </button>
