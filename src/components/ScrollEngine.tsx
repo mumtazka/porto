@@ -7,66 +7,95 @@ gsap.registerPlugin(ScrollTrigger);
 
 const IS_TOUCH = typeof window !== 'undefined' && 'ontouchstart' in window;
 
-/* ── Custom Cursor ─────────────────────────────────────── */
+/* ── Morphing Cursor ───────────────────────────────────── */
 function CustomCursor() {
     const ringRef = useRef<HTMLDivElement>(null);
     const dotRef = useRef<HTMLDivElement>(null);
-    const textRef = useRef<HTMLDivElement>(null);
+    const labelRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (IS_TOUCH) return;
 
         const ring = ringRef.current;
         const dot = dotRef.current;
-        const text = textRef.current;
-        if (!ring || !dot || !text) return;
+        const label = labelRef.current;
+        if (!ring || !dot || !label) return;
 
-        let mx = 0, my = 0, rx = 0, ry = 0, rafId = 0;
+        let mx = 0, my = 0, rx = 0, ry = 0;
+        let rafId = 0;
+        let state = 'default';
+        let hovered: HTMLElement | null = null;
 
         const onMove = (e: MouseEvent) => { mx = e.clientX; my = e.clientY; };
 
         const loop = () => {
-            rx += (mx - rx) * 0.15;
-            ry += (my - ry) * 0.15;
-            ring.style.transform = `translate(${rx}px, ${ry}px)`;
-            dot.style.transform = `translate(${mx}px, ${my}px)`;
+            let tx = mx, ty = my;
+
+            // Magnetic pull toward hovered element center
+            if (hovered && (state === 'button' || state === 'link' || state === 'labeled')) {
+                const r = hovered.getBoundingClientRect();
+                tx = mx + (r.left + r.width / 2 - mx) * 0.35;
+                ty = my + (r.top + r.height / 2 - my) * 0.35;
+            }
+
+            const speed = state === 'default' || state === 'text' || state === 'heading' ? 0.12 : 0.08;
+            rx += (tx - rx) * speed;
+            ry += (ty - ry) * speed;
+
+            ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
+            dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%, -50%)`;
+
             rafId = requestAnimationFrame(loop);
         };
 
-        const onEnter = (e: Event) => {
-            const label = (e.currentTarget as HTMLElement).getAttribute('data-cursor');
-            ring.style.transform += ' scale(2.5)';
-            ring.style.opacity = '0.15';
-            dot.style.transform += ' scale(0.5)';
-            if (label) { text.textContent = label; text.style.opacity = '1'; }
+        // Resolve cursor state from hovered element
+        const resolve = (el: Element): [string, string?] => {
+            const dc = el.closest('[data-cursor]');
+            if (dc) return ['labeled', dc.getAttribute('data-cursor') || ''];
+            if (el.closest('button, .btn-primary, .btn-outline')) return ['button'];
+            if (el.closest('a[href]')) return ['link'];
+            if (el.closest('input, textarea')) return ['input'];
+            if (el.closest('.glass, .glass-strong')) return ['card'];
+            if (el.closest('img, video')) return ['media'];
+            if (el.closest('h1, h2, h3')) return ['heading'];
+            if (el.closest('p')) return ['text'];
+            return ['default'];
         };
 
-        const onLeave = () => {
-            ring.style.opacity = '0.5';
-            dot.style.transform = dot.style.transform.replace(' scale(0.5)', '');
-            text.style.opacity = '0';
+        const apply = (s: string, text?: string) => {
+            if (state === s) return;
+            state = s;
+            ring.dataset.state = s;
+            dot.dataset.state = s;
+            label.textContent = text || '';
+            label.dataset.show = text ? '1' : '0';
         };
 
-        // Use event delegation on body instead of per-element listeners
-        const onBodyOver = (e: MouseEvent) => {
-            const target = (e.target as HTMLElement).closest('a, button, [data-cursor], input, textarea');
-            if (target) onEnter({ currentTarget: target } as unknown as Event);
+        const onOver = (e: MouseEvent) => {
+            const el = e.target as HTMLElement;
+            const [s, t] = resolve(el);
+            hovered = el.closest('button, a, [data-cursor], .glass, .glass-strong') as HTMLElement || null;
+            apply(s, t);
         };
-        const onBodyOut = (e: MouseEvent) => {
-            const target = (e.target as HTMLElement).closest('a, button, [data-cursor], input, textarea');
-            if (target) onLeave();
-        };
+
+        const onLeaveDoc = () => { hovered = null; apply('default'); };
+        const onDown = () => { ring.dataset.pressed = '1'; };
+        const onUp = () => { ring.dataset.pressed = '0'; };
 
         window.addEventListener('mousemove', onMove, { passive: true });
-        document.body.addEventListener('mouseover', onBodyOver, { passive: true });
-        document.body.addEventListener('mouseout', onBodyOut, { passive: true });
+        document.addEventListener('mouseover', onOver, { passive: true });
+        document.addEventListener('mouseleave', onLeaveDoc);
+        window.addEventListener('mousedown', onDown);
+        window.addEventListener('mouseup', onUp);
         rafId = requestAnimationFrame(loop);
 
         return () => {
             cancelAnimationFrame(rafId);
             window.removeEventListener('mousemove', onMove);
-            document.body.removeEventListener('mouseover', onBodyOver);
-            document.body.removeEventListener('mouseout', onBodyOut);
+            document.removeEventListener('mouseover', onOver);
+            document.removeEventListener('mouseleave', onLeaveDoc);
+            window.removeEventListener('mousedown', onDown);
+            window.removeEventListener('mouseup', onUp);
         };
     }, []);
 
@@ -74,25 +103,10 @@ function CustomCursor() {
 
     return (
         <>
-            <div ref={ringRef} style={{
-                position: 'fixed', top: -20, left: -20, width: 40, height: 40,
-                borderRadius: '50%', border: '1.5px solid rgba(249,115,22,0.6)',
-                pointerEvents: 'none', zIndex: 9999, opacity: 0.5,
-                mixBlendMode: 'difference', willChange: 'transform',
-                transition: 'opacity 0.4s, transform 0.1s linear',
-            }}>
-                <div ref={textRef} style={{
-                    position: 'absolute', top: '50%', left: '50%',
-                    transform: 'translate(-50%,-50%)', fontSize: 8, fontWeight: 700,
-                    color: '#F97316', letterSpacing: '0.05em', textTransform: 'uppercase',
-                    whiteSpace: 'nowrap', opacity: 0, transition: 'opacity 0.2s',
-                }} />
+            <div ref={ringRef} className="cursor-ring" data-state="default" data-pressed="0">
+                <div ref={labelRef} className="cursor-label" data-show="0" />
             </div>
-            <div ref={dotRef} style={{
-                position: 'fixed', top: -4, left: -4, width: 8, height: 8,
-                borderRadius: '50%', background: '#F97316',
-                pointerEvents: 'none', zIndex: 9999, willChange: 'transform',
-            }} />
+            <div ref={dotRef} className="cursor-dot" data-state="default" />
         </>
     );
 }

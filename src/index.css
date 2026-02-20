@@ -353,7 +353,190 @@
   }
 }
 
-/* Section divider */
+/* ═══════════════════════════════════════════════════
+   MORPHING CURSOR — shape-shifts per element type
+   ═══════════════════════════════════════════════════ */
+
+.cursor-ring,
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform;
+}
+
+/* Ring — default circle */
+.cursor-ring {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(249, 115, 22, 0.5);
+  background: transparent;
+  mix-blend-mode: difference;
+  transition:
+    width 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+    height 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+    border-radius 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+    border-color 0.3s,
+    border-width 0.3s,
+    border-style 0.1s,
+    background 0.3s,
+    mix-blend-mode 0.1s;
+}
+
+/* Pressed — squeeze on click */
+.cursor-ring[data-pressed="1"] {
+  width: 26px !important;
+  height: 26px !important;
+}
+
+/* Text — vertical caret bar */
+.cursor-ring[data-state="text"] {
+  width: 2px;
+  height: 24px;
+  border-radius: 1px;
+  border: none;
+  background: rgba(249, 115, 22, 0.7);
+  mix-blend-mode: normal;
+}
+
+/* Heading — taller gradient bar */
+.cursor-ring[data-state="heading"] {
+  width: 3px;
+  height: 34px;
+  border-radius: 2px;
+  border: none;
+  background: linear-gradient(180deg, #F97316, #FBBF24);
+  mix-blend-mode: normal;
+}
+
+/* Button — large magnetic filled ring */
+.cursor-ring[data-state="button"],
+.cursor-ring[data-state="labeled"] {
+  width: 72px;
+  height: 72px;
+  border: 2px solid rgba(249, 115, 22, 0.5);
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.1) 0%, transparent 70%);
+  mix-blend-mode: normal;
+}
+
+/* Card — dashed outline ring */
+.cursor-ring[data-state="card"] {
+  width: 56px;
+  height: 56px;
+  border: 2px dashed rgba(249, 115, 22, 0.35);
+  background: transparent;
+  mix-blend-mode: normal;
+}
+
+/* Link — cyan themed ring */
+.cursor-ring[data-state="link"] {
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid rgba(6, 182, 212, 0.6);
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.08) 0%, transparent 70%);
+  mix-blend-mode: normal;
+}
+
+/* Input — blinking caret */
+.cursor-ring[data-state="input"] {
+  width: 2px;
+  height: 20px;
+  border-radius: 1px;
+  border: none;
+  background: #F97316;
+  mix-blend-mode: normal;
+  animation: cursor-blink 0.9s steps(2) infinite;
+}
+
+/* Media — white focus ring */
+.cursor-ring[data-state="media"] {
+  width: 52px;
+  height: 52px;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+  mix-blend-mode: normal;
+}
+
+/* ── Dot ────────────────────────────────── */
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #F97316;
+  z-index: 10000;
+  transition: opacity 0.3s, background 0.3s, box-shadow 0.3s;
+}
+
+.cursor-dot[data-state="text"],
+.cursor-dot[data-state="heading"],
+.cursor-dot[data-state="input"],
+.cursor-dot[data-state="button"],
+.cursor-dot[data-state="labeled"] {
+  opacity: 0;
+}
+
+.cursor-dot[data-state="link"] {
+  background: #06B6D4;
+}
+
+.cursor-dot[data-state="media"] {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.cursor-dot[data-state="card"] {
+  box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4);
+  animation: cursor-dot-pulse 1.5s ease-in-out infinite;
+}
+
+/* ── Label (inside ring) ────────────────── */
+.cursor-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 9px;
+  font-weight: 700;
+  color: #F97316;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.cursor-label[data-show="1"] {
+  opacity: 1;
+}
+
+/* ── Cursor Keyframes ───────────────────── */
+@keyframes cursor-blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes cursor-dot-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px rgba(249, 115, 22, 0);
+  }
+}
+
+/* ── Section divider ────────────────────── */
 .section-divider {
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.3), transparent);
