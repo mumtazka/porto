@@ -155,8 +155,8 @@ export default function Contact() {
                 </div>
                 <div>
                   <p className="text-gray-600 text-sm">Email</p>
-                  <a href="mailto:hello@mumtaz.dev" className="text-gray-900 hover:text-orange-400 transition-colors">
-                    hello@mumtaz.dev
+                  <a href="mailto:mumtazalfan1307@gmail.com" className="text-gray-900 hover:text-orange-400 transition-colors">
+                    mumtazalfan1307@gmail.com
                   </a>
                 </div>
               </div>
@@ -177,8 +177,8 @@ export default function Contact() {
                 </div>
                 <div>
                   <p className="text-gray-600 text-sm">Phone</p>
-                  <a href="tel:+6281234567890" className="text-gray-900 hover:text-orange-400 transition-colors">
-                    +62 812 3456 7890
+                  <a href="tel:+6285801214943" className="text-gray-900 hover:text-orange-400 transition-colors">
+                    +62 858 0121 4943
                   </a>
                 </div>
               </div>
