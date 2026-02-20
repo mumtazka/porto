@@ -343,12 +343,31 @@
   color: #141414;
 }
 
-/* Hide default cursor on desktop */
+/* Hide default cursor on desktop mostly for interactive elements */
 @media (hover: hover) and (pointer: fine) {
 
-  *,
-  *::before,
-  *::after {
+  [data-cursor],
+  button,
+  a,
+  input,
+  textarea,
+  .glass,
+  .glass-strong,
+  img,
+  video,
+  h1,
+  h2,
+  h3,
+  p,
+  [data-cursor] *,
+  button *,
+  a *,
+  .glass *,
+  .glass-strong *,
+  h1 *,
+  h2 *,
+  h3 *,
+  p * {
     cursor: none !important;
   }
 }
@@ -383,7 +402,12 @@
     border-width 0.3s,
     border-style 0.1s,
     background 0.3s,
-    mix-blend-mode 0.1s;
+    mix-blend-mode 0.1s,
+    opacity 0.3s;
+}
+
+.cursor-ring[data-state="default"] {
+  opacity: 0;
 }
 
 /* Pressed — squeeze on click */
@@ -468,6 +492,10 @@
   background: #F97316;
   z-index: 10000;
   transition: opacity 0.3s, background 0.3s, box-shadow 0.3s;
+}
+
+.cursor-dot[data-state="default"] {
+  opacity: 0;
 }
 
 .cursor-dot[data-state="text"],

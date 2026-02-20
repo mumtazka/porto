@@ -68,9 +68,9 @@ export default function GitHubContributions() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isVisible, setIsVisible] = useState(false);
-    const [hoveredDay, setHoveredDay] = useState<{ day: ContributionDay; x: number; y: number } | null>(null);
     const sectionRef = useRef<HTMLElement>(null);
     const graphRef = useRef<HTMLDivElement>(null);
+    const tooltipRef = useRef<HTMLDivElement>(null);
 
     // Intersection observer for section visibility
     useEffect(() => {
@@ -240,12 +240,28 @@ export default function GitHubContributions() {
 
     const handleDayHover = (day: ContributionDay, event: React.MouseEvent) => {
         const rect = graphRef.current?.getBoundingClientRect();
-        if (rect) {
-            setHoveredDay({
-                day,
-                x: event.clientX - rect.left,
-                y: event.clientY - rect.top,
+        const tooltip = tooltipRef.current;
+        if (rect && tooltip) {
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            tooltip.style.display = 'block';
+            tooltip.style.left = `${Math.min(x, (graphRef.current?.clientWidth || 0) - 180)}px`;
+            tooltip.style.top = `${y - 45}px`;
+
+            const countText = `${day.contributionCount} contribution${day.contributionCount !== 1 ? 's' : ''}`;
+            const dateStr = new Date(day.date).toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
             });
+
+            tooltip.innerHTML = `
+                <p class="font-semibold">${countText}</p>
+                <p class="text-gray-400">${dateStr}</p>
+                <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+            `;
         }
     };
 
@@ -373,7 +389,7 @@ export default function GitHubContributions() {
                                                         key={dayIndex}
                                                         className={`w-[12px] h-[12px] rounded-[3px] border transition-all duration-200 cursor-pointer hover:scale-150 hover:z-10 ${getContributionColor(day.contributionLevel, day.contributionCount)} ${getContributionBorder(day.contributionLevel, day.contributionCount)}`}
                                                         onMouseEnter={(e) => handleDayHover(day, e)}
-                                                        onMouseLeave={() => setHoveredDay(null)}
+                                                        onMouseLeave={() => { if (tooltipRef.current) tooltipRef.current.style.display = 'none'; }}
                                                         style={{
                                                             animationDelay: `${weekIndex * 10}ms`,
                                                         }}
@@ -384,28 +400,11 @@ export default function GitHubContributions() {
                                     </div>
 
                                     {/* Tooltip */}
-                                    {hoveredDay && (
-                                        <div
-                                            className="absolute z-20 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg pointer-events-none whitespace-nowrap"
-                                            style={{
-                                                left: `${Math.min(hoveredDay.x, (graphRef.current?.clientWidth || 0) - 180)}px`,
-                                                top: `${hoveredDay.y - 45}px`,
-                                            }}
-                                        >
-                                            <p className="font-semibold">
-                                                {hoveredDay.day.contributionCount} contribution{hoveredDay.day.contributionCount !== 1 ? 's' : ''}
-                                            </p>
-                                            <p className="text-gray-400">
-                                                {new Date(hoveredDay.day.date).toLocaleDateString('en-US', {
-                                                    weekday: 'short',
-                                                    month: 'short',
-                                                    day: 'numeric',
-                                                    year: 'numeric',
-                                                })}
-                                            </p>
-                                            <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
-                                        </div>
-                                    )}
+                                    <div
+                                        ref={tooltipRef}
+                                        className="absolute z-20 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg pointer-events-none whitespace-nowrap"
+                                        style={{ display: 'none' }}
+                                    />
                                 </div>{/* end graph */}
 
                                 {/* Mona — GIF mascot */}

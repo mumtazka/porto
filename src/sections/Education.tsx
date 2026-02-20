@@ -27,7 +27,6 @@ function useReveal() {
 /* ─── Education Entry ───────────────────────────────────────────────────── */
 function EduEntry({ edu, index }: { edu: any; index: number }) {
   const { ref, visible } = useReveal();
-  const isEven = index % 2 === 0;
 
   return (
     <div
