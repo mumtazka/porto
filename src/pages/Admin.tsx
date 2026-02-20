@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   LayoutDashboard,
   Briefcase,
@@ -17,10 +17,32 @@ import {
   Eye,
   Brain,
   RotateCcw,
-  CheckCircle2
+  CheckCircle2,
+  Upload,
+  ChevronDown,
+  Check
 } from 'lucide-react';
 import { useAuth, useProjects, useEducation, useAchievements, useMessages, usePersonalContext } from '../hooks/useSupabase';
 import type { Project, Education, Achievement } from '../types/database';
+
+const CLOUDINARY_CLOUD_NAME = 'dcf93og8f';
+const CLOUDINARY_UPLOAD_PRESET = 'portfolio_upload';
+
+const TECH_STACK_OPTIONS = [
+  'React', 'Next.js', 'Vue.js', 'Angular', 'Svelte', 'TypeScript', 'JavaScript',
+  'Node.js', 'Express', 'NestJS', 'Python', 'Django', 'FastAPI', 'Flask',
+  'Go', 'Rust', 'Java', 'Spring Boot', 'C#', '.NET',
+  'PostgreSQL', 'MySQL', 'MongoDB', 'Redis', 'Firebase', 'Supabase',
+  'GraphQL', 'REST API', 'tRPC',
+  'Tailwind CSS', 'CSS3', 'SASS', 'Bootstrap', 'Material UI', 'Chakra UI',
+  'Docker', 'Kubernetes', 'AWS', 'Google Cloud', 'Azure', 'Vercel', 'Netlify',
+  'Git', 'GitHub Actions', 'CI/CD', 'Linux',
+  'Figma', 'Adobe XD', 'Photoshop',
+  'GSAP', 'Three.js', 'Framer Motion',
+  'Prisma', 'Drizzle ORM', 'Zod',
+  'Socket.io', 'WebSockets', 'WebRTC',
+  'Electron', 'React Native', 'Flutter'
+].sort();
 
 type Tab = 'projects' | 'education' | 'achievements' | 'messages' | 'ai-context';
 
@@ -28,7 +50,7 @@ interface ProjectFormData {
   title: string;
   description: string;
   image_url: string;
-  tech_stack: string;
+  tech_stack: string[];
   project_url: string;
   github_url: string;
   featured: boolean;
@@ -57,7 +79,7 @@ const INITIAL_PROJECT_FORM: ProjectFormData = {
   title: '',
   description: '',
   image_url: '',
-  tech_stack: '',
+  tech_stack: [],
   project_url: '',
   github_url: '',
   featured: false,
@@ -103,12 +125,31 @@ export default function Admin() {
   const [achievementForm, setAchievementForm] = useState<AchievementFormData>(INITIAL_ACHIEVEMENT_FORM);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [techDropdownOpen, setTechDropdownOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const educationFileInputRef = useRef<HTMLInputElement>(null);
+  const achievementFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (user) {
       fetchMessages();
     }
   }, [user, fetchMessages]);
+
+  useEffect(() => {
+    const handleClickOutside = () => setTechDropdownOpen(false);
+    if (techDropdownOpen) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [techDropdownOpen]);
+
+  useEffect(() => {
+    if (!showModal) {
+      setTechDropdownOpen(false);
+    }
+  }, [showModal]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,7 +178,7 @@ export default function Admin() {
         title: project.title,
         description: project.description,
         image_url: project.image_url,
-        tech_stack: project.tech_stack.join(', '),
+        tech_stack: project.tech_stack || [],
         project_url: project.project_url || '',
         github_url: project.github_url || '',
         featured: project.featured,
@@ -188,12 +229,63 @@ export default function Admin() {
     setShowModal(true);
   };
 
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    formData.append('folder', 'portfolio');
+    formData.append('quality', 'auto:good');
+    formData.append('fetch_format', 'auto');
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+      {
+        method: 'POST',
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to upload image');
+    }
+
+    const data = await response.json();
+    return data.secure_url;
+  };
+
+  const handleImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setter: (url: string) => void
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const url = await uploadToCloudinary(file);
+      setter(url);
+    } catch (error) {
+      alert('Failed to upload image. Please try again.');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const toggleTechStack = (tech: string) => {
+    const current = projectForm.tech_stack;
+    if (current.includes(tech)) {
+      setProjectForm({ ...projectForm, tech_stack: current.filter(t => t !== tech) });
+    } else {
+      setProjectForm({ ...projectForm, tech_stack: [...current, tech] });
+    }
+  };
+
   const handleProjectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     const projectData = {
       ...projectForm,
-      tech_stack: projectForm.tech_stack.split(',').map(s => s.trim()).filter(Boolean),
+      tech_stack: projectForm.tech_stack,
     };
     if (editingProject) {
       await updateProject(editingProject.id, projectData);
@@ -995,24 +1087,105 @@ export default function Admin() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Project Image</label>
                   <input
-                    type="url"
-                    value={projectForm.image_url}
-                    onChange={(e) => setProjectForm({ ...projectForm, image_url: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    required
+                    type="file"
+                    ref={fileInputRef}
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, (url) => setProjectForm({ ...projectForm, image_url: url }))}
+                    className="hidden"
                   />
+                  <div className="flex gap-3 items-center">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingImage}
+                      className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-orange-400 hover:text-orange-500 transition-all disabled:opacity-50"
+                    >
+                      {uploadingImage ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <Upload className="w-5 h-5" />
+                      )}
+                      {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                    </button>
+                    {projectForm.image_url && (
+                      <img
+                        src={projectForm.image_url}
+                        alt="Preview"
+                        className="w-16 h-16 rounded-lg object-cover border border-gray-200"
+                      />
+                    )}
+                  </div>
+                  {projectForm.image_url && (
+                    <input
+                      type="text"
+                      value={projectForm.image_url}
+                      readOnly
+                      className="mt-2 w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-500"
+                    />
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Tech Stack (comma separated)</label>
-                  <input
-                    type="text"
-                    value={projectForm.tech_stack}
-                    onChange={(e) => setProjectForm({ ...projectForm, tech_stack: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="React, Node.js, TypeScript"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Tech Stack</label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setTechDropdownOpen(!techDropdownOpen)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl text-left flex items-center justify-between text-gray-900 hover:border-orange-400 transition-colors"
+                    >
+                      <span className={projectForm.tech_stack.length > 0 ? '' : 'text-gray-400'}>
+                        {projectForm.tech_stack.length > 0 
+                          ? `${projectForm.tech_stack.length} selected` 
+                          : 'Select technologies...'}
+                      </span>
+                      <ChevronDown className={`w-5 h-5 transition-transform ${techDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {techDropdownOpen && (
+                      <div className="absolute z-50 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                        {TECH_STACK_OPTIONS.map((tech) => (
+                          <button
+                            key={tech}
+                            type="button"
+                            onClick={() => toggleTechStack(tech)}
+                            className={`w-full px-4 py-2.5 text-left flex items-center gap-3 hover:bg-orange-50 transition-colors ${
+                              projectForm.tech_stack.includes(tech) ? 'bg-orange-50 text-orange-600' : 'text-gray-700'
+                            }`}
+                          >
+                            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                              projectForm.tech_stack.includes(tech) 
+                                ? 'bg-orange-500 border-orange-500' 
+                                : 'border-gray-300'
+                            }`}>
+                              {projectForm.tech_stack.includes(tech) && (
+                                <Check className="w-3 h-3 text-white" />
+                              )}
+                            </div>
+                            {tech}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {projectForm.tech_stack.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {projectForm.tech_stack.map((tech) => (
+                        <span
+                          key={tech}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 bg-orange-100 text-orange-700 text-sm rounded-full"
+                        >
+                          {tech}
+                          <button
+                            type="button"
+                            onClick={() => toggleTechStack(tech)}
+                            className="hover:text-orange-900"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -1110,13 +1283,36 @@ export default function Admin() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Certificate Image URL</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Certificate Image</label>
                   <input
-                    type="url"
-                    value={educationForm.certificate_image}
-                    onChange={(e) => setEducationForm({ ...educationForm, certificate_image: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    type="file"
+                    ref={educationFileInputRef}
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, (url) => setEducationForm({ ...educationForm, certificate_image: url }))}
+                    className="hidden"
                   />
+                  <div className="flex gap-3 items-center">
+                    <button
+                      type="button"
+                      onClick={() => educationFileInputRef.current?.click()}
+                      disabled={uploadingImage}
+                      className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-orange-400 hover:text-orange-500 transition-all disabled:opacity-50"
+                    >
+                      {uploadingImage ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <Upload className="w-5 h-5" />
+                      )}
+                      {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                    </button>
+                    {educationForm.certificate_image && (
+                      <img
+                        src={educationForm.certificate_image}
+                        alt="Preview"
+                        className="w-16 h-16 rounded-lg object-cover border border-gray-200"
+                      />
+                    )}
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
@@ -1191,13 +1387,36 @@ export default function Admin() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Achievement Image</label>
                   <input
-                    type="url"
-                    value={achievementForm.image_url}
-                    onChange={(e) => setAchievementForm({ ...achievementForm, image_url: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    type="file"
+                    ref={achievementFileInputRef}
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, (url) => setAchievementForm({ ...achievementForm, image_url: url }))}
+                    className="hidden"
                   />
+                  <div className="flex gap-3 items-center">
+                    <button
+                      type="button"
+                      onClick={() => achievementFileInputRef.current?.click()}
+                      disabled={uploadingImage}
+                      className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-orange-400 hover:text-orange-500 transition-all disabled:opacity-50"
+                    >
+                      {uploadingImage ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <Upload className="w-5 h-5" />
+                      )}
+                      {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                    </button>
+                    {achievementForm.image_url && (
+                      <img
+                        src={achievementForm.image_url}
+                        alt="Preview"
+                        className="w-16 h-16 rounded-lg object-cover border border-gray-200"
+                      />
+                    )}
+                  </div>
                 </div>
                 <button type="submit" className="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all" disabled={isSubmitting}>
                   {isSubmitting ? (
