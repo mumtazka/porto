@@ -361,7 +361,7 @@ export default function GitHubContributions() {
                                                 className="text-xs text-gray-400 shrink-0"
                                                 style={{
                                                     width: i < monthPositions.length - 1
-                                                        ? `${(monthPositions[i + 1].index - pos.index) * 14}px`
+                                                        ? `${(monthPositions[i + 1].index - pos.index) * 16}px`
                                                         : 'auto',
                                                 }}
                                             >
@@ -375,7 +375,7 @@ export default function GitHubContributions() {
                                         {/* Day Labels */}
                                         <div className="flex flex-col gap-0.5 mr-1 shrink-0">
                                             {DAY_LABELS.map((label, i) => (
-                                                <div key={i} className="h-[12px] flex items-center">
+                                                <div key={i} className="h-[14px] flex items-center">
                                                     <span className="text-[10px] text-gray-400 w-6 text-right">{label}</span>
                                                 </div>
                                             ))}
@@ -387,7 +387,7 @@ export default function GitHubContributions() {
                                                 {week.contributionDays.map((day, dayIndex) => (
                                                     <div
                                                         key={dayIndex}
-                                                        className={`w-[12px] h-[12px] rounded-[3px] border transition-all duration-200 cursor-pointer hover:scale-150 hover:z-10 ${getContributionColor(day.contributionLevel, day.contributionCount)} ${getContributionBorder(day.contributionLevel, day.contributionCount)}`}
+                                                        className={`w-[14px] h-[14px] rounded-[3px] border transition-all duration-200 cursor-pointer hover:scale-150 hover:z-10 ${getContributionColor(day.contributionLevel, day.contributionCount)} ${getContributionBorder(day.contributionLevel, day.contributionCount)}`}
                                                         onMouseEnter={(e) => handleDayHover(day, e)}
                                                         onMouseLeave={() => { if (tooltipRef.current) tooltipRef.current.style.display = 'none'; }}
                                                         style={{
@@ -408,13 +408,12 @@ export default function GitHubContributions() {
                                 </div>{/* end graph */}
 
                                 {/* Mona — GIF mascot */}
-                                <div className="hidden md:flex flex-col items-center justify-center shrink-0 select-none group/mona" style={{ width: 120 }}>
+                                <div className="hidden md:flex items-center justify-center shrink-0 select-none group/mona" style={{ width: 140 }}>
                                     <img
                                         src="/mona-loading-dark.gif"
                                         alt="Mona Octocat"
-                                        className="w-20 h-20 object-contain transition-transform duration-500 group-hover/mona:scale-110"
+                                        className="w-32 h-32 object-contain transition-transform duration-500 group-hover/mona:scale-110"
                                     />
-                                    <span className="text-[10px] text-gray-400 mt-2 tracking-wide font-medium">Mona</span>
                                 </div>
 
                             </div>{/* end flex row */}
@@ -438,11 +437,11 @@ export default function GitHubContributions() {
 
                                 <div className="flex items-center gap-1.5 text-xs text-gray-400">
                                     <span>Less</span>
-                                    <div className="w-[12px] h-[12px] rounded-[3px] bg-gray-100 border border-gray-200" />
-                                    <div className="w-[12px] h-[12px] rounded-[3px] bg-orange-200 border border-orange-300" />
-                                    <div className="w-[12px] h-[12px] rounded-[3px] bg-orange-300 border border-orange-400" />
-                                    <div className="w-[12px] h-[12px] rounded-[3px] bg-orange-400 border border-orange-500" />
-                                    <div className="w-[12px] h-[12px] rounded-[3px] bg-orange-500 border border-orange-600" />
+                                    <div className="w-[14px] h-[14px] rounded-[3px] bg-gray-100 border border-gray-200" />
+                                    <div className="w-[14px] h-[14px] rounded-[3px] bg-orange-200 border border-orange-300" />
+                                    <div className="w-[14px] h-[14px] rounded-[3px] bg-orange-300 border border-orange-400" />
+                                    <div className="w-[14px] h-[14px] rounded-[3px] bg-orange-400 border border-orange-500" />
+                                    <div className="w-[14px] h-[14px] rounded-[3px] bg-orange-500 border border-orange-600" />
                                     <span>More</span>
                                 </div>
                             </div>
