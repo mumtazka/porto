@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User, Sparkles } from 'lucide-react';
+import { X, Send, Bot, User, Sparkles } from 'lucide-react';
 import { getPersonalContext } from '../hooks/useSupabase';
 import { createChatSessionQuery, addChatMessageQuery } from '../hooks/useChatQuery';
 import type { ChatMessage } from '../types/database';
@@ -341,24 +341,44 @@ export default function AIChatbot() {
       {!isOpen && (
         <button
           onClick={handleOpenChat}
-          className="fixed bottom-24 lg:bottom-8 right-4 lg:right-8 z-50 group"
+          className="group relative w-14 h-14"
+          style={{
+            position: 'fixed',
+            bottom: '2rem',
+            right: '2rem',
+            zIndex: 99999,
+            pointerEvents: 'auto',
+          }}
           aria-label="Open Luna AI Chat"
         >
-          <div className="absolute inset-0 bg-orange-500 rounded-full animate-ping opacity-30" />
-          <div className="relative w-14 h-14 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center shadow-glow-strong hover:scale-110 transition-transform duration-300">
-            <MessageCircle className="w-6 h-6 text-white" />
+          <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-orange-400 via-amber-400 to-cyan-400 blur-md opacity-60" />
+          <div className="absolute inset-0 rounded-full bg-orange-500 animate-ping opacity-25" />
+          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 ring-2 ring-white/70 shadow-[0_12px_28px_rgba(251,146,60,0.45)] transition-transform duration-300 group-hover:scale-110" />
+          <div className="relative z-10 w-14 h-14 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
+            <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-cyan-200 shadow-[0_0_10px_rgba(34,211,238,0.95)]" />
+            <Bot className="w-6 h-6 text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)]" />
+            <Sparkles className="absolute -left-1 -top-1 w-4 h-4 text-amber-100 drop-shadow-[0_2px_4px_rgba(0,0,0,0.35)]" />
           </div>
-          <div className="absolute -top-1 -right-1 px-2 py-0.5 bg-cyan-500 text-white text-[10px] font-medium rounded-full">
+          <div className="absolute -top-1 -right-1 z-20 px-2 py-0.5 bg-cyan-500 text-white text-[10px] font-medium rounded-full shadow-[0_4px_10px_rgba(6,182,212,0.45)]">
             Luna
           </div>
           <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-gray-800 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap">
-            Chat with Luna ✨
+            Chat with Luna
           </div>
         </button>
       )}
 
       {isOpen && (
-        <div className="fixed bottom-24 lg:bottom-8 right-4 lg:right-8 z-50 w-[calc(100vw-2rem)] sm:w-96 animate-scale-in">
+        <div
+          className="w-[calc(100vw-2rem)] sm:w-96 animate-scale-in"
+          style={{
+            position: 'fixed',
+            bottom: '2rem',
+            right: '2rem',
+            zIndex: 99999,
+            pointerEvents: 'auto',
+          }}
+        >
           <div className="glass-strong rounded-2xl overflow-hidden shadow-2xl">
             <div className="flex items-center justify-between p-4 border-b border-black/10">
               <div className="flex items-center gap-3">
