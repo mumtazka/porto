@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot, User, Sparkles } from 'lucide-react';
-import { getPersonalContext, createChatSession, addChatMessage } from '../hooks/useSupabase';
+import { getPersonalContext } from '../hooks/useSupabase';
+import { createChatSessionQuery, addChatMessageQuery } from '../hooks/useChatQuery';
 import type { ChatMessage } from '../types/database';
 
 interface Message {
@@ -259,7 +260,7 @@ export default function AIChatbot() {
     if (nameToUse) {
       localStorage.setItem(VISITOR_NAME_KEY, nameToUse);
     }
-    const newSessionId = await createChatSession(nameToUse || undefined);
+    const newSessionId = await createChatSessionQuery(nameToUse || undefined);
     if (newSessionId) {
       localStorage.setItem(SESSION_ID_KEY, newSessionId);
       setSessionId(newSessionId);
@@ -269,7 +270,7 @@ export default function AIChatbot() {
   };
 
   const handleSkipName = async () => {
-    const newSessionId = await createChatSession();
+    const newSessionId = await createChatSessionQuery();
     if (newSessionId) {
       localStorage.setItem(SESSION_ID_KEY, newSessionId);
       setSessionId(newSessionId);
@@ -286,7 +287,7 @@ export default function AIChatbot() {
       content: message.content,
       timestamp: message.timestamp.toISOString(),
     };
-    await addChatMessage(sessionId, chatMessage);
+    await addChatMessageQuery(sessionId, chatMessage);
   };
 
   const handleSend = async () => {

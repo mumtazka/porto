@@ -20,9 +20,12 @@ import {
   CheckCircle2,
   Upload,
   ChevronDown,
-  Check
+  Check,
+  MessageSquare,
+  User,
+  Bot
 } from 'lucide-react';
-import { useAuth, useProjects, useEducation, useAchievements, useMessages, usePersonalContext } from '../hooks/useSupabase';
+import { useAuth, useProjects, useEducation, useAchievements, useMessages, usePersonalContext, useChatSessions } from '../hooks/useSupabase';
 import type { Project, Education, Achievement } from '../types/database';
 
 const CLOUDINARY_CLOUD_NAME = 'dcf93og8f';
@@ -44,7 +47,7 @@ const TECH_STACK_OPTIONS = [
   'Electron', 'React Native', 'Flutter'
 ].sort();
 
-type Tab = 'projects' | 'education' | 'achievements' | 'messages' | 'ai-context';
+type Tab = 'projects' | 'education' | 'achievements' | 'messages' | 'chat-history' | 'ai-context';
 
 interface ProjectFormData {
   title: string;
@@ -111,6 +114,7 @@ export default function Admin() {
   const { education, loading: educationLoading, addEducation, updateEducation, deleteEducation } = useEducation();
   const { achievements, loading: achievementsLoading, addAchievement, updateAchievement, deleteAchievement } = useAchievements();
   const { messages, fetchMessages, deleteMessage } = useMessages();
+  const { sessions: chatSessions, fetchSessions: fetchChatSessions, deleteSession: deleteChatSession } = useChatSessions();
 
   const [activeTab, setActiveTab] = useState<Tab>('projects');
   const [email, setEmail] = useState('');
@@ -134,8 +138,9 @@ export default function Admin() {
   useEffect(() => {
     if (user) {
       fetchMessages();
+      fetchChatSessions();
     }
-  }, [user, fetchMessages]);
+  }, [user, fetchMessages, fetchChatSessions]);
 
   useEffect(() => {
     const handleClickOutside = () => setTechDropdownOpen(false);
@@ -356,6 +361,7 @@ export default function Admin() {
     { id: 'education', label: 'Education', icon: <GraduationCap className="w-5 h-5" />, count: education.length },
     { id: 'achievements', label: 'Achievements', icon: <Award className="w-5 h-5" />, count: achievements.length },
     { id: 'messages', label: 'Messages', icon: <Mail className="w-5 h-5" />, count: messages.length },
+    { id: 'chat-history', label: 'Chat History', icon: <MessageSquare className="w-5 h-5" />, count: chatSessions.length },
     { id: 'ai-context', label: 'AI Brain', icon: <Brain className="w-5 h-5" /> },
   ];
 
@@ -794,6 +800,114 @@ export default function Admin() {
                         Read more
                       </button>
                     )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Chat History Tab */}
+        {activeTab === 'chat-history' && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                  <MessageSquare className="w-7 h-7 text-orange-500" />
+                  Chat History
+                </h2>
+                <p className="text-gray-500 text-sm mt-1">Conversations visitors had with Luna AI</p>
+              </div>
+              <button
+                onClick={fetchChatSessions}
+                className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 text-gray-600 font-medium rounded-xl hover:bg-gray-50 transition-all"
+              >
+                <Loader2 className="w-4 h-4" />
+                Refresh
+              </button>
+            </div>
+
+            {chatSessions.length === 0 ? (
+              <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center">
+                  <MessageSquare className="w-8 h-8 text-orange-400" />
+                </div>
+                <p className="text-gray-500 font-medium">No chat history yet</p>
+                <p className="text-gray-400 text-sm mt-1">Conversations from the AI chatbot will appear here</p>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {chatSessions.map((session) => (
+                  <div
+                    key={session.id}
+                    className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all"
+                  >
+                    <div className="bg-gradient-to-r from-orange-50 to-amber-50 px-5 py-4 border-b border-orange-100/50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-md">
+                            <span className="text-white font-bold text-lg">
+                              {session.visitor_name ? session.visitor_name.charAt(0).toUpperCase() : '?'}
+                            </span>
+                          </div>
+                          <div>
+                            <h3 className="text-gray-900 font-semibold text-lg">
+                              {session.visitor_name || 'Anonymous Visitor'}
+                            </h3>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="px-2 py-0.5 bg-orange-100 text-orange-600 text-xs font-medium rounded-full">
+                                {session.messages.length} {session.messages.length === 1 ? 'message' : 'messages'}
+                              </span>
+                              <span className="text-gray-400 text-xs">
+                                Started {new Date(session.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-gray-400 text-sm">
+                            {new Date(session.updated_at).toLocaleDateString('en-US', {
+                              month: 'short', day: 'numeric',
+                              hour: '2-digit', minute: '2-digit'
+                            })}
+                          </span>
+                          <button
+                            onClick={() => {
+                              if (confirm('Delete this chat session?')) {
+                                deleteChatSession(session.id);
+                              }
+                            }}
+                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 space-y-3 max-h-64 overflow-y-auto">
+                      {session.messages.map((msg, idx) => (
+                        <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                            msg.role === 'user' 
+                              ? 'bg-gradient-to-br from-cyan-500 to-blue-500' 
+                              : 'bg-gradient-to-br from-orange-500 to-amber-500'
+                          }`}>
+                            {msg.role === 'user' ? (
+                              <User className="w-4 h-4 text-white" />
+                            ) : (
+                              <Bot className="w-4 h-4 text-white" />
+                            )}
+                          </div>
+                          <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${
+                            msg.role === 'user'
+                              ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-tr-none'
+                              : 'bg-gray-100 text-gray-800 rounded-tl-none'
+                          }`}>
+                            {msg.content}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
