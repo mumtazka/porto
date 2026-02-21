@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot, User, Sparkles } from 'lucide-react';
-import { getPersonalContext } from '../hooks/useSupabase';
+import { getPersonalContext, createChatSession, addChatMessage } from '../hooks/useSupabase';
+import type { ChatMessage } from '../types/database';
 
 interface Message {
   id: string;
@@ -18,11 +19,9 @@ const INITIAL_MESSAGES: Message[] = [
   },
 ];
 
-/** Build a fresh system prompt from localStorage context + live portfolio data */
 function buildSystemPrompt(): string {
   const ctx = getPersonalContext();
 
-  // Read live data from localStorage (written by the hooks)
   let projectsText = '';
   try {
     const raw = localStorage.getItem('portfolio_projects');
@@ -165,21 +164,18 @@ function getFallbackResponse(input: string): string {
   const ctx = getPersonalContext();
   const lowerInput = input.toLowerCase();
 
-  // Identity questions
   if (lowerInput.includes('luna') || lowerInput.includes('who are you') || lowerInput.includes('siapa kamu')) {
     return `I'm Luna ✨ — ${ctx.name}'s personal AI assistant! I'm here to chat, share info about him, or just vibe with you. What's up?`;
   }
   if (lowerInput.includes('gemini') || lowerInput.includes('chatgpt') || lowerInput.includes('openai')) {
     return `Nah, I'm Luna 😄 Not ChatGPT, not Gemini — just me. Anyway, what can I help you with?`;
   }
-  // Casual greetings
   if (lowerInput.includes('hello') || lowerInput.includes('hi') || lowerInput.includes('hey') || lowerInput.includes('halo') || lowerInput.includes('hai')) {
     return `Hey hey! 👋 I'm Luna. What's on your mind? You can ask about ${ctx.name} or we can just chat — totally up to you!`;
   }
   if (lowerInput.includes('how are you') || lowerInput.includes('apa kabar') || lowerInput.includes('gimana kabar')) {
     return `Doing great, thanks for asking! 😊 Always happy when someone swings by. What's up with you?`;
   }
-  // Portfolio-specific
   if (lowerInput.includes('skill') || lowerInput.includes('tech') || lowerInput.includes('stack') || lowerInput.includes('bisa apa')) {
     return `${ctx.name} is solid with: ${ctx.skills}. Always leveling up too 🚀 Anything specific you're curious about?`;
   }
@@ -213,29 +209,85 @@ function getFallbackResponse(input: string): string {
   if (lowerInput.includes('location') || lowerInput.includes('where') || lowerInput.includes('dari mana') || lowerInput.includes('tinggal')) {
     return `${ctx.name} is based in ${ctx.location} 🗺️ Open to remote work too!`;
   }
-  // General fallback
   return `Hmm, I'm running in offline mode right now so my brain is a bit limited 😅 But feel free to ask about ${ctx.name}'s skills, projects, or background!`;
 }
 
+const SESSION_ID_KEY = 'luna_session_id';
+const VISITOR_NAME_KEY = 'luna_visitor_name';
+
 export default function AIChatbot() {
   const [isOpen, setIsOpen] = useState(false);
+  const [showNamePrompt, setShowNamePrompt] = useState(false);
+  const [nameInput, setNameInput] = useState('');
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Focus input when opened
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && showNamePrompt) {
+      setTimeout(() => nameInputRef.current?.focus(), 100);
+    } else if (isOpen && !showNamePrompt) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
-  }, [isOpen]);
+  }, [isOpen, showNamePrompt]);
+
+  useEffect(() => {
+    const savedSessionId = localStorage.getItem(SESSION_ID_KEY);
+    if (savedSessionId) {
+      setSessionId(savedSessionId);
+    }
+  }, []);
+
+  const handleOpenChat = () => {
+    setIsOpen(true);
+    if (!sessionId) {
+      setShowNamePrompt(true);
+    }
+  };
+
+  const handleNameSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const nameToUse = nameInput.trim() || null;
+    if (nameToUse) {
+      localStorage.setItem(VISITOR_NAME_KEY, nameToUse);
+    }
+    const newSessionId = await createChatSession(nameToUse || undefined);
+    if (newSessionId) {
+      localStorage.setItem(SESSION_ID_KEY, newSessionId);
+      setSessionId(newSessionId);
+    }
+    setShowNamePrompt(false);
+    setTimeout(() => inputRef.current?.focus(), 100);
+  };
+
+  const handleSkipName = async () => {
+    const newSessionId = await createChatSession();
+    if (newSessionId) {
+      localStorage.setItem(SESSION_ID_KEY, newSessionId);
+      setSessionId(newSessionId);
+    }
+    setShowNamePrompt(false);
+    setTimeout(() => inputRef.current?.focus(), 100);
+  };
+
+  const saveMessage = async (message: Message) => {
+    if (!sessionId) return;
+    const chatMessage: ChatMessage = {
+      id: message.id,
+      role: message.role,
+      content: message.content,
+      timestamp: message.timestamp.toISOString(),
+    };
+    await addChatMessage(sessionId, chatMessage);
+  };
 
   const handleSend = async () => {
     if (!input.trim() || isTyping) return;
@@ -248,6 +300,7 @@ export default function AIChatbot() {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    saveMessage(userMessage);
     const userInput = input.trim();
     setInput('');
     setIsTyping(true);
@@ -261,6 +314,7 @@ export default function AIChatbot() {
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, assistantMessage]);
+      saveMessage(assistantMessage);
     } catch {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -283,38 +337,28 @@ export default function AIChatbot() {
 
   return (
     <>
-      {/* Floating Button */}
       {!isOpen && (
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={handleOpenChat}
           className="fixed bottom-24 lg:bottom-8 right-4 lg:right-8 z-50 group"
           aria-label="Open Luna AI Chat"
         >
-          {/* Pulse Animation */}
           <div className="absolute inset-0 bg-orange-500 rounded-full animate-ping opacity-30" />
-
-          {/* Button */}
           <div className="relative w-14 h-14 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center shadow-glow-strong hover:scale-110 transition-transform duration-300">
             <MessageCircle className="w-6 h-6 text-white" />
           </div>
-
-          {/* Badge */}
           <div className="absolute -top-1 -right-1 px-2 py-0.5 bg-cyan-500 text-white text-[10px] font-medium rounded-full">
             Luna
           </div>
-
-          {/* Tooltip */}
           <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-gray-800 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap">
             Chat with Luna ✨
           </div>
         </button>
       )}
 
-      {/* Chat Modal */}
       {isOpen && (
         <div className="fixed bottom-24 lg:bottom-8 right-4 lg:right-8 z-50 w-[calc(100vw-2rem)] sm:w-96 animate-scale-in">
           <div className="glass-strong rounded-2xl overflow-hidden shadow-2xl">
-            {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-black/10">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
@@ -337,89 +381,126 @@ export default function AIChatbot() {
               </button>
             </div>
 
-            {/* Messages */}
-            <div className="h-80 overflow-y-auto p-4 space-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
-                >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.role === 'assistant'
-                    ? 'bg-gradient-to-br from-orange-500 to-amber-500'
-                    : 'bg-cyan-500'
-                    }`}>
-                    {message.role === 'assistant' ? (
-                      <Bot className="w-4 h-4 text-white" />
-                    ) : (
-                      <User className="w-4 h-4 text-white" />
-                    )}
+            {showNamePrompt ? (
+              <div className="p-6">
+                <div className="text-center mb-4">
+                  <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
+                    <Bot className="w-8 h-8 text-white" />
                   </div>
-                  <div
-                    className={`max-w-[75%] p-3 rounded-2xl text-sm ${message.role === 'assistant'
-                      ? 'glass text-gray-900 rounded-tl-none'
-                      : 'bg-orange-500 text-white rounded-tr-none'
-                      }`}
-                  >
-                    {message.content}
+                  <h3 className="text-gray-900 font-semibold text-lg">Hi there! 👋</h3>
+                  <p className="text-gray-500 text-sm mt-1">What should I call you?</p>
+                  <p className="text-gray-400 text-xs mt-1">(Optional — you can skip if you prefer)</p>
+                </div>
+                <form onSubmit={handleNameSubmit} className="space-y-3">
+                  <input
+                    ref={nameInputRef}
+                    type="text"
+                    value={nameInput}
+                    onChange={(e) => setNameInput(e.target.value)}
+                    placeholder="Your name..."
+                    className="w-full px-4 py-3 glass rounded-xl text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    maxLength={50}
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={handleSkipName}
+                      className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-600 font-medium rounded-xl hover:bg-gray-50 transition-all"
+                    >
+                      Skip
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 px-4 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-medium rounded-xl hover:shadow-lg transition-all"
+                    >
+                      Start Chat
+                    </button>
+                  </div>
+                </form>
+              </div>
+            ) : (
+              <>
+                <div className="h-80 overflow-y-auto p-4 space-y-4">
+                  {messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
+                    >
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.role === 'assistant'
+                        ? 'bg-gradient-to-br from-orange-500 to-amber-500'
+                        : 'bg-cyan-500'
+                        }`}>
+                        {message.role === 'assistant' ? (
+                          <Bot className="w-4 h-4 text-white" />
+                        ) : (
+                          <User className="w-4 h-4 text-white" />
+                        )}
+                      </div>
+                      <div
+                        className={`max-w-[75%] p-3 rounded-2xl text-sm ${message.role === 'assistant'
+                          ? 'glass text-gray-900 rounded-tl-none'
+                          : 'bg-orange-500 text-white rounded-tr-none'
+                          }`}
+                      >
+                        {message.content}
+                      </div>
+                    </div>
+                  ))}
+
+                  {isTyping && (
+                    <div className="flex gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
+                        <Bot className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="glass p-3 rounded-2xl rounded-tl-none flex items-center gap-1">
+                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                    </div>
+                  )}
+
+                  <div ref={messagesEndRef} />
+                </div>
+
+                <div className="p-4 border-t border-black/10">
+                  <div className="flex gap-2">
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Ask Luna anything..."
+                      className="flex-1 px-4 py-2 glass rounded-xl text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    />
+                    <button
+                      onClick={handleSend}
+                      disabled={!input.trim() || isTyping}
+                      className="p-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      aria-label="Send message"
+                    >
+                      <Send className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {["Who's Mumtaz?", 'His skills?', 'Just chatting 😊', 'Contact?'].map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        onClick={() => {
+                          setInput(suggestion);
+                          inputRef.current?.focus();
+                        }}
+                        className="px-3 py-1 glass rounded-full text-gray-600 text-xs hover:text-orange-400 hover:border-orange-500/30 transition-colors"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              ))}
-
-              {/* Typing Indicator */}
-              {isTyping && (
-                <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
-                    <Bot className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="glass p-3 rounded-2xl rounded-tl-none flex items-center gap-1">
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                  </div>
-                </div>
-              )}
-
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input */}
-            <div className="p-4 border-t border-black/10">
-              <div className="flex gap-2">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Ask Luna anything..."
-                  className="flex-1 px-4 py-2 glass rounded-xl text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                />
-                <button
-                  onClick={handleSend}
-                  disabled={!input.trim() || isTyping}
-                  className="p-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  aria-label="Send message"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Suggestions */}
-              <div className="flex flex-wrap gap-2 mt-3">
-                {["Who's Mumtaz?", 'His skills?', 'Just chatting 😊', 'Contact?'].map((suggestion) => (
-                  <button
-                    key={suggestion}
-                    onClick={() => {
-                      setInput(suggestion);
-                      inputRef.current?.focus();
-                    }}
-                    className="px-3 py-1 glass rounded-full text-gray-600 text-xs hover:text-orange-400 hover:border-orange-500/30 transition-colors"
-                  >
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
-            </div>
+              </>
+            )}
           </div>
         </div>
       )}

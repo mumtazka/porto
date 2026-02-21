@@ -68,6 +68,15 @@ create table if not exists public.personal_context (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- 6. Chat Sessions Table (for AI chat history)
+create table if not exists public.chat_sessions (
+  id uuid primary key default gen_random_uuid(),
+  visitor_name text,
+  messages jsonb not null default '[]'::jsonb,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
 -- Note: To allow proper CRUD from your Admin panel as an Anonymous/Authenticated User, you will need to enable RLS and set policies below, or temporarily disable RLS for testing.
 
 -- Disable RLS temporarily to allow unrestricted CRUD for all tables (Or write proper Authenticated policies)
@@ -76,3 +85,4 @@ alter table public.education disable row level security;
 alter table public.achievements disable row level security;
 alter table public.messages disable row level security;
 alter table public.personal_context disable row level security;
+alter table public.chat_sessions disable row level security;

@@ -185,11 +185,42 @@ export interface Database {
           created_at?: string;
         };
       };
+      chat_sessions: {
+        Row: {
+          id: string;
+          visitor_name: string | null;
+          messages: ChatMessage[];
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          visitor_name?: string | null;
+          messages?: ChatMessage[];
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          visitor_name?: string | null;
+          messages?: ChatMessage[];
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
   };
+}
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
 }
 
 export type Project = Database['public']['Tables']['projects']['Row'];
 export type Education = Database['public']['Tables']['education']['Row'];
 export type Message = Database['public']['Tables']['messages']['Row'];
 export type Achievement = Database['public']['Tables']['achievements']['Row'];
+export type ChatSession = Database['public']['Tables']['chat_sessions']['Row'];

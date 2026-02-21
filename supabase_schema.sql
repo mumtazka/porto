@@ -7,6 +7,23 @@ create table if not exists tech_stack (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- Create chat_sessions table for AI chat history
+create table if not exists chat_sessions (
+  id uuid primary key default gen_random_uuid(),
+  visitor_name text,
+  messages jsonb not null default '[]'::jsonb,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS
+alter table chat_sessions enable row level security;
+
+-- Allow public read/write for chat sessions
+create policy "Public Chat Sessions Access"
+  on chat_sessions for all
+  using ( true );
+
 -- Enable Row Level Security (RLS)
 alter table tech_stack enable row level security;
 

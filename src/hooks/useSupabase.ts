@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { mockProjects, mockEducation, mockAchievements, isSupabaseConfigured, supabase } from '../utils/supabaseClient';
-import type { Project, Education, Message, Achievement } from '../types/database';
+import type { Project, Education, Message, Achievement, ChatSession, ChatMessage } from '../types/database';
 
 // Helper: load from localStorage or fallback
 function loadFromStorage<T>(key: string, fallback: T[]): T[] {
@@ -482,4 +482,189 @@ export const getPersonalContext = (): PersonalContext => {
     if (stored) return { ...DEFAULT_CONTEXT, ...JSON.parse(stored) };
   } catch { }
   return DEFAULT_CONTEXT;
+};
+
+// ─── Chat Sessions (AI Chat History) ────────────────────────────────────────────
+
+export const useChatSessions = () => {
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchSessions = useCallback(async () => {
+    setLoading(true);
+    try {
+      if (!isSupabaseConfigured()) {
+        setSessions(loadFromStorage<ChatSession>('portfolio_chat_sessions', []));
+        return;
+      }
+      const { data, error } = await supabase
+        .from('chat_sessions')
+        .select('*')
+        .order('updated_at', { ascending: false });
+      if (error) throw error;
+      setSessions(data || []);
+    } catch {
+      setSessions(loadFromStorage<ChatSession>('portfolio_chat_sessions', []));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const createSession = async (visitorName?: string): Promise<ChatSession | null> => {
+    try {
+      if (!isSupabaseConfigured()) {
+        const newSession: ChatSession = {
+          id: Math.random().toString(36).substr(2, 9),
+          visitor_name: visitorName || null,
+          messages: [],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        const stored = loadFromStorage<ChatSession>('portfolio_chat_sessions', []);
+        const updated = [newSession, ...stored];
+        saveToStorage('portfolio_chat_sessions', updated);
+        return newSession;
+      }
+      const { data, error } = await supabase
+        .from('chat_sessions')
+        .insert([{ visitor_name: visitorName || null, messages: [] }])
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('Failed to create chat session:', err);
+      return null;
+    }
+  };
+
+  const addMessageToSession = async (sessionId: string, message: ChatMessage): Promise<boolean> => {
+    try {
+      if (!isSupabaseConfigured()) {
+        setSessions(prev => {
+          const updated = prev.map(s => {
+            if (s.id === sessionId) {
+              return {
+                ...s,
+                messages: [...s.messages, message],
+                updated_at: new Date().toISOString(),
+              };
+            }
+            return s;
+          });
+          saveToStorage('portfolio_chat_sessions', updated);
+          return updated;
+        });
+        return true;
+      }
+      const { data, error } = await supabase
+        .from('chat_sessions')
+        .select('messages')
+        .eq('id', sessionId)
+        .single();
+      if (error) throw error;
+      const currentMessages = (data?.messages as ChatMessage[]) || [];
+      const { error: updateError } = await supabase
+        .from('chat_sessions')
+        .update({
+          messages: [...currentMessages, message],
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', sessionId);
+      if (updateError) throw updateError;
+      return true;
+    } catch (err) {
+      console.error('Failed to add message to session:', err);
+      return false;
+    }
+  };
+
+  const deleteSession = async (id: string) => {
+    if (!isSupabaseConfigured()) {
+      setSessions(prev => {
+        const updated = prev.filter(s => s.id !== id);
+        saveToStorage('portfolio_chat_sessions', updated);
+        return updated;
+      });
+      return { error: null };
+    }
+    return await supabase.from('chat_sessions').delete().eq('id', id);
+  };
+
+  return {
+    sessions,
+    loading,
+    fetchSessions,
+    createSession,
+    addMessageToSession,
+    deleteSession,
+  };
+};
+
+// Helper to create session and add messages without React
+export const createChatSession = async (visitorName?: string): Promise<string | null> => {
+  try {
+    if (!isSupabaseConfigured()) {
+      const newSession: ChatSession = {
+        id: Math.random().toString(36).substr(2, 9),
+        visitor_name: visitorName || null,
+        messages: [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      const stored = loadFromStorage<ChatSession>('portfolio_chat_sessions', []);
+      const updated = [newSession, ...stored];
+      saveToStorage('portfolio_chat_sessions', updated);
+      return newSession.id;
+    }
+    const { data, error } = await supabase
+      .from('chat_sessions')
+      .insert([{ visitor_name: visitorName || null, messages: [] }])
+      .select()
+      .single();
+    if (error) throw error;
+    return data.id;
+  } catch (err) {
+    console.error('Failed to create chat session:', err);
+    return null;
+  }
+};
+
+export const addChatMessage = async (sessionId: string, message: ChatMessage): Promise<boolean> => {
+  try {
+    if (!isSupabaseConfigured()) {
+      const stored = loadFromStorage<ChatSession>('portfolio_chat_sessions', []);
+      const updated = stored.map(s => {
+        if (s.id === sessionId) {
+          return {
+            ...s,
+            messages: [...s.messages, message],
+            updated_at: new Date().toISOString(),
+          };
+        }
+        return s;
+      });
+      saveToStorage('portfolio_chat_sessions', updated);
+      return true;
+    }
+    const { data, error } = await supabase
+      .from('chat_sessions')
+      .select('messages')
+      .eq('id', sessionId)
+      .single();
+    if (error) throw error;
+    const currentMessages = (data?.messages as ChatMessage[]) || [];
+    const { error: updateError } = await supabase
+      .from('chat_sessions')
+      .update({
+        messages: [...currentMessages, message],
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', sessionId);
+    if (updateError) throw updateError;
+    return true;
+  } catch (err) {
+    console.error('Failed to add message to session:', err);
+    return false;
+  }
 };
