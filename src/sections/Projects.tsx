@@ -109,52 +109,67 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
 function FeaturedProjectCard({ project, onClick }: { project: Project; onClick: () => void }) {
   return (
     <div
-      className="flex-shrink-0 w-[400px] h-[550px] relative group cursor-pointer overflow-hidden rounded-3xl glass-strong border border-white/40 shadow-xl transition-all duration-500 hover:shadow-2xl hover:-translate-y-2"
+      className="w-full h-full min-h-[500px] flex flex-col relative group cursor-pointer overflow-hidden rounded-[2.5rem] bg-white/40 backdrop-blur-md border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.1)] hover:border-white transition-all duration-500 hover:-translate-y-2"
       onClick={onClick}
       data-cursor="view"
     >
-      {/* Image Half */}
-      <div className="h-1/2 overflow-hidden relative">
-        <div className="absolute inset-0 bg-gray-900/10 group-hover:bg-transparent transition-colors duration-500 z-10" />
-        <img
-          src={project.image_url}
-          alt={project.title}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-        />
-        {/* Featured Badge */}
-        <div className="absolute top-4 left-4 z-20">
-          <span className="px-3 py-1 bg-white/90 backdrop-blur text-orange-600 text-xs font-bold rounded-full border border-orange-100 shadow-sm flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />
-            FEATURED
-          </span>
+      {/* Thumbnail Section */}
+      <div className="h-[300px] w-full relative p-3 pb-0">
+        <div className="w-full h-full relative overflow-hidden rounded-[2rem] shadow-sm bg-gray-100">
+          {/* Dark Gradient Overlay for Contrast */}
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent z-10 opacity-70 group-hover:opacity-90 transition-opacity duration-500" />
+
+          <img
+            src={project.image_url}
+            alt={project.title}
+            className="w-full h-full object-cover transform transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-110 group-hover:rotate-1"
+          />
+
+          {/* Featured Badge */}
+          <div className="absolute top-4 left-4 z-20 transform -translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 delay-100">
+            <span className="px-3.5 py-1.5 bg-white/95 backdrop-blur text-orange-600 text-[10px] font-black tracking-widest uppercase rounded-full shadow-lg border border-orange-100/50 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />
+              FEATURED
+            </span>
+          </div>
+
+          {/* View Action Overlay */}
+          <div className="absolute bottom-4 right-4 z-20 transform translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 delay-[150ms]">
+            <div className="w-12 h-12 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-xl shadow-orange-500/30 group-hover:scale-110 transition-transform duration-300">
+              <ArrowRight className="w-5 h-5 -rotate-45 group-hover:rotate-0 transition-transform duration-500" />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Content Half */}
-      <div className="h-1/2 p-6 flex flex-col relative bg-white/50 backdrop-blur-sm">
-        <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-orange-600 transition-colors">
+      {/* Content Section */}
+      <div className="flex-1 p-8 pt-6 flex flex-col relative z-20">
+        <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-orange-600 group-hover:to-orange-400 transition-all duration-300">
           {project.title}
         </h3>
-        <p className="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-3">
+        <p className="text-gray-600 text-[15px] leading-relaxed mb-6 line-clamp-2">
           {project.description}
         </p>
 
         <div className="mt-auto">
-          <div className="flex flex-wrap gap-2 mb-4">
-            {project.tech_stack.slice(0, 3).map((tech) => (
-              <span key={tech} className="px-2 py-1 bg-white border border-gray-100 rounded-lg text-xs text-gray-600 font-medium">
+          <div className="flex flex-wrap gap-2">
+            {project.tech_stack.slice(0, 4).map((tech, i) => (
+              <span
+                key={tech}
+                className="px-3 py-1.5 bg-white border border-gray-100 rounded-xl text-xs text-gray-600 font-semibold shadow-[0_2px_10px_rgb(0,0,0,0.02)] transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300"
+                style={{ transitionDelay: `${i * 75}ms` }}
+              >
                 {tech}
               </span>
             ))}
-            {project.tech_stack.length > 3 && (
-              <span className="px-2 py-1 bg-white border border-gray-100 rounded-lg text-xs text-gray-500">
-                +{project.tech_stack.length - 3}
+            {project.tech_stack.length > 4 && (
+              <span
+                className="px-3 py-1.5 bg-gray-50/80 border border-gray-100 rounded-xl text-xs text-gray-500 font-medium transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300"
+                style={{ transitionDelay: `${4 * 75}ms` }}
+              >
+                +{project.tech_stack.length - 4}
               </span>
             )}
-          </div>
-
-          <div className="flex items-center text-orange-500 font-medium text-sm group/btn">
-            View Project <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover/btn:translate-x-1" />
           </div>
         </div>
       </div>
@@ -169,8 +184,6 @@ export default function Projects() {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    document.documentElement.style.setProperty('--scroll-duration', '40s');
-
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) setIsVisible(true);
@@ -183,11 +196,6 @@ export default function Projects() {
   }, []);
 
   const featuredProjects = projects.filter(p => p.featured);
-  // Create duplicates for seamless loop, ensure minimum length
-  const carouselItems = featuredProjects.length > 0
-    ? [...featuredProjects, ...featuredProjects, ...featuredProjects] // Triple up to ensure enough content for smooth loop
-    : [];
-
   const selectedProject = projects.find(p => p.id === selectedProjectId);
 
   return (
@@ -218,30 +226,23 @@ export default function Projects() {
 
         {/* Loading Skeleton */}
         {loading && (
-          <div className="flex gap-8 overflow-hidden px-12 pb-12">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex-shrink-0 w-[400px] h-[550px] glass rounded-3xl animate-pulse bg-gray-100/50" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 mb-32">
+            {[1, 2].map((i) => (
+              <div key={i} className="w-full h-[550px] glass rounded-3xl animate-pulse bg-gray-100/50" />
             ))}
           </div>
         )}
 
-        {/* Featured Projects - Infinite Carousel Layout */}
+        {/* Featured Projects - 2 Column Grid */}
         {!loading && featuredProjects.length > 0 && (
-          <div className="mb-32 relative w-full overflow-hidden group">
-            {/* Fade Gradients at Edges */}
-            <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-charcoal/30 to-transparent z-[5] pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-charcoal/30 to-transparent z-[5] pointer-events-none" />
-
-            {/* Carousel Track */}
-            <div className="flex gap-8 animate-scroll-left hover-pause w-max px-8 pl-12 py-4">
-              {carouselItems.map((project, index) => (
-                <FeaturedProjectCard
-                  key={`${project.id}-${index}`}
-                  project={project}
-                  onClick={() => setSelectedProjectId(project.id)}
-                />
-              ))}
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 mb-32">
+            {featuredProjects.map((project) => (
+              <FeaturedProjectCard
+                key={project.id}
+                project={project}
+                onClick={() => setSelectedProjectId(project.id)}
+              />
+            ))}
           </div>
         )}
 
