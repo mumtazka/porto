@@ -392,7 +392,7 @@ export const usePersonalContext = () => {
       const { data, error } = await supabase
         .from('personal_context')
         .select('*')
-        .single();
+        .maybeSingle();
 
       if (!error && data) {
         // Map snake_case from DB to camelCase for app
@@ -461,7 +461,7 @@ export const usePersonalContext = () => {
         await supabase.from('personal_context').update(dbPayload).eq('id', context.id);
       } else {
         // Try to find existing row first, or insert
-        const { data } = await supabase.from('personal_context').select('id').single();
+        const { data } = await supabase.from('personal_context').select('id').maybeSingle();
         if (data) {
           await supabase.from('personal_context').update(dbPayload).eq('id', data.id);
         } else {

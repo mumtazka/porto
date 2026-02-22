@@ -29,7 +29,7 @@ import { useAuth, useProjects, useEducation, useAchievements, useMessages, usePe
 import type { Project, Education, Achievement } from '../types/database';
 
 const CLOUDINARY_CLOUD_NAME = 'dcf93og8f';
-const CLOUDINARY_UPLOAD_PRESET = 'portfolio_upload';
+const CLOUDINARY_UPLOAD_PRESET = 'portofolio_upload';
 
 const TECH_STACK_OPTIONS = [
   'React', 'Next.js', 'Vue.js', 'Angular', 'Svelte', 'TypeScript', 'JavaScript',
@@ -131,9 +131,11 @@ export default function Admin() {
   const [selectedMessage, setSelectedMessage] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [techDropdownOpen, setTechDropdownOpen] = useState(false);
+  const [techSearchTerm, setTechSearchTerm] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const educationFileInputRef = useRef<HTMLInputElement>(null);
   const achievementFileInputRef = useRef<HTMLInputElement>(null);
+  const techDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (user) {
@@ -143,16 +145,21 @@ export default function Admin() {
   }, [user, fetchMessages, fetchChatSessions]);
 
   useEffect(() => {
-    const handleClickOutside = () => setTechDropdownOpen(false);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (techDropdownRef.current && !techDropdownRef.current.contains(event.target as Node)) {
+        setTechDropdownOpen(false);
+      }
+    };
     if (techDropdownOpen) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [techDropdownOpen]);
 
   useEffect(() => {
     if (!showModal) {
       setTechDropdownOpen(false);
+      setTechSearchTerm('');
     }
   }, [showModal]);
 
@@ -251,7 +258,9 @@ export default function Admin() {
     );
 
     if (!response.ok) {
-      throw new Error('Failed to upload image');
+      const errData = await response.json().catch(() => ({}));
+      console.error('Cloudinary upload failed:', errData);
+      throw new Error(errData.error?.message || 'Failed to upload image');
     }
 
     const data = await response.json();
@@ -269,8 +278,8 @@ export default function Admin() {
     try {
       const url = await uploadToCloudinary(file);
       setter(url);
-    } catch (error) {
-      alert('Failed to upload image. Please try again.');
+    } catch (error: any) {
+      alert(`Upload Error: ${error.message}`);
     } finally {
       setUploadingImage(false);
     }
@@ -887,22 +896,20 @@ export default function Admin() {
                     <div className="p-4 space-y-3 max-h-64 overflow-y-auto">
                       {session.messages.map((msg, idx) => (
                         <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                            msg.role === 'user' 
-                              ? 'bg-gradient-to-br from-cyan-500 to-blue-500' 
-                              : 'bg-gradient-to-br from-orange-500 to-amber-500'
-                          }`}>
+                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${msg.role === 'user'
+                            ? 'bg-gradient-to-br from-cyan-500 to-blue-500'
+                            : 'bg-gradient-to-br from-orange-500 to-amber-500'
+                            }`}>
                             {msg.role === 'user' ? (
                               <User className="w-4 h-4 text-white" />
                             ) : (
                               <Bot className="w-4 h-4 text-white" />
                             )}
                           </div>
-                          <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${
-                            msg.role === 'user'
-                              ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-tr-none'
-                              : 'bg-gray-100 text-gray-800 rounded-tl-none'
-                          }`}>
+                          <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${msg.role === 'user'
+                            ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-tr-none'
+                            : 'bg-gray-100 text-gray-800 rounded-tl-none'
+                            }`}>
                             {msg.content}
                           </div>
                         </div>
@@ -1242,42 +1249,91 @@ export default function Admin() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Tech Stack</label>
-                  <div className="relative">
+                  <div className="relative" ref={techDropdownRef}>
                     <button
                       type="button"
                       onClick={() => setTechDropdownOpen(!techDropdownOpen)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl text-left flex items-center justify-between text-gray-900 hover:border-orange-400 transition-colors"
                     >
                       <span className={projectForm.tech_stack.length > 0 ? '' : 'text-gray-400'}>
-                        {projectForm.tech_stack.length > 0 
-                          ? `${projectForm.tech_stack.length} selected` 
+                        {projectForm.tech_stack.length > 0
+                          ? `${projectForm.tech_stack.length} selected`
                           : 'Select technologies...'}
                       </span>
                       <ChevronDown className={`w-5 h-5 transition-transform ${techDropdownOpen ? 'rotate-180' : ''}`} />
                     </button>
                     {techDropdownOpen && (
-                      <div className="absolute z-50 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                        {TECH_STACK_OPTIONS.map((tech) => (
-                          <button
-                            key={tech}
-                            type="button"
-                            onClick={() => toggleTechStack(tech)}
-                            className={`w-full px-4 py-2.5 text-left flex items-center gap-3 hover:bg-orange-50 transition-colors ${
-                              projectForm.tech_stack.includes(tech) ? 'bg-orange-50 text-orange-600' : 'text-gray-700'
-                            }`}
-                          >
-                            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                              projectForm.tech_stack.includes(tech) 
-                                ? 'bg-orange-500 border-orange-500' 
-                                : 'border-gray-300'
-                            }`}>
-                              {projectForm.tech_stack.includes(tech) && (
-                                <Check className="w-3 h-3 text-white" />
-                              )}
-                            </div>
-                            {tech}
-                          </button>
-                        ))}
+                      <div className="absolute z-50 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg flex flex-col">
+                        <div className="p-3 border-b border-gray-100">
+                          <input
+                            type="text"
+                            value={techSearchTerm}
+                            onChange={(e) => setTechSearchTerm(e.target.value)}
+                            placeholder="Search or add new tech..."
+                            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </div>
+                        <div className="max-h-60 overflow-y-auto p-1">
+                          {(() => {
+                            const term = techSearchTerm.toLowerCase().trim();
+                            const filtered = TECH_STACK_OPTIONS.filter((t) =>
+                              t.toLowerCase().includes(term)
+                            );
+                            const showAddCustom =
+                              term && !TECH_STACK_OPTIONS.find((t) => t.toLowerCase() === term);
+
+                            return (
+                              <>
+                                {filtered.map((tech) => (
+                                  <button
+                                    key={tech}
+                                    type="button"
+                                    onClick={() => toggleTechStack(tech)}
+                                    className={`w-full px-4 py-2.5 text-left flex items-center gap-3 hover:bg-orange-50 rounded-lg transition-colors ${projectForm.tech_stack.includes(tech)
+                                      ? 'bg-orange-50 text-orange-600'
+                                      : 'text-gray-700'
+                                      }`}
+                                  >
+                                    <div
+                                      className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${projectForm.tech_stack.includes(tech)
+                                        ? 'bg-orange-500 border-orange-500'
+                                        : 'border-gray-300'
+                                        }`}
+                                    >
+                                      {projectForm.tech_stack.includes(tech) && (
+                                        <Check className="w-3 h-3 text-white" />
+                                      )}
+                                    </div>
+                                    <span className="truncate">{tech}</span>
+                                  </button>
+                                ))}
+
+                                {showAddCustom && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      toggleTechStack(techSearchTerm.trim());
+                                      setTechSearchTerm('');
+                                    }}
+                                    className="w-full px-4 py-2.5 text-left flex items-center gap-3 hover:bg-orange-50 rounded-lg transition-colors text-orange-600 font-medium"
+                                  >
+                                    <div className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 bg-orange-100 text-orange-600">
+                                      <Plus className="w-4 h-4" />
+                                    </div>
+                                    <span className="truncate">Add "{techSearchTerm.trim()}"</span>
+                                  </button>
+                                )}
+
+                                {filtered.length === 0 && !showAddCustom && (
+                                  <div className="px-4 py-3 text-sm text-gray-500 text-center">
+                                    No options found
+                                  </div>
+                                )}
+                              </>
+                            );
+                          })()}
+                        </div>
                       </div>
                     )}
                   </div>
