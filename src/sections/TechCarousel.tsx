@@ -155,36 +155,36 @@ export default function TechCarousel() {
     if (!trackRef.current || techStack.length === 0) return;
 
     const track = trackRef.current;
-    const totalWidth = track.scrollWidth / 2; // 2 of 4 copies
+    const totalWidth = track.scrollWidth / 2;
 
-    const BASE = 0.5;   // px/frame leftward at rest  ← slower idle
-    const BOOST = 2.0;  // multiplier when scrolling   ← gentler boost
+    const BASE = 0.5;
+    const BOOST = 2.0;
 
-    // "locked" speed — stays at whatever direction was last set
     let lockedSpeed = BASE;
     let speed = BASE;
     let xPos = 0;
+    let isTrackVisible = false;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      isTrackVisible = entry.isIntersecting;
+    }, { threshold: 0 });
+
+    observer.observe(track);
 
     const st = ScrollTrigger.create({
       start: 0,
       end: 'max',
       onUpdate(self) {
-        // direction 1 = down → move left (positive BASE)
-        // direction -1 = up  → move right (negative BASE)
         lockedSpeed = self.direction === 1 ? BASE * BOOST : -(BASE * BOOST);
       },
     });
 
     const tick = () => {
-      // Smoothly ease into the locked speed — no automatic decay back
+      if (!isTrackVisible) return;
       speed += (lockedSpeed - speed) * 0.03;
-
       xPos -= speed;
-
-      // Seamless infinite wrap
       if (xPos <= -totalWidth) xPos += totalWidth;
       if (xPos > 0) xPos -= totalWidth;
-
       gsap.set(track, { x: xPos });
     };
 
@@ -192,6 +192,7 @@ export default function TechCarousel() {
     gsap.ticker.lagSmoothing(0);
 
     return () => {
+      observer.disconnect();
       gsap.ticker.remove(tick);
       st.kill();
     };

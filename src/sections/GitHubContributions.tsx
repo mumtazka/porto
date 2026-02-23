@@ -93,53 +93,26 @@ export default function GitHubContributions() {
     // Fetch contribution data from GitHub GraphQL API
     useEffect(() => {
         async function fetchContributions() {
-            const token = import.meta.env.VITE_GITHUB_TOKEN;
+            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+            const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-            if (!token) {
-                setError('GitHub token not configured');
+            if (!supabaseUrl || !anonKey) {
+                setError('Supabase config missing');
                 setLoading(false);
                 return;
             }
 
-            const query = `
-        query($username: String!) {
-          user(login: $username) {
-            contributionsCollection {
-              contributionCalendar {
-                totalContributions
-                weeks {
-                  contributionDays {
-                    contributionCount
-                    date
-                    color
-                    contributionLevel
-                  }
-                }
-              }
-              totalCommitContributions
-              totalPullRequestContributions
-              totalRepositoriesWithContributedCommits
-              restrictedContributionsCount
-            }
-          }
-        }
-      `;
-
             try {
-                const response = await fetch('https://api.github.com/graphql', {
+                const response = await fetch(`${supabaseUrl}/functions/v1/github-contributions`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
+                        'Authorization': `Bearer ${anonKey}`,
                         'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        query,
-                        variables: { username: GITHUB_USERNAME },
-                    }),
+                    }
                 });
 
                 if (!response.ok) {
-                    throw new Error(`GitHub API error: ${response.status}`);
+                    throw new Error(`Edge function error: ${response.status}`);
                 }
 
                 const data = await response.json();
@@ -413,6 +386,7 @@ export default function GitHubContributions() {
                                         src="/mona-loading-dark.gif"
                                         alt="Mona Octocat"
                                         className="w-32 h-32 object-contain transition-transform duration-500 group-hover/mona:scale-110"
+                                        loading="lazy"
                                     />
                                 </div>
 

@@ -80,6 +80,17 @@
     font-weight: 800;
     letter-spacing: -0.03em;
   }
+
+  section {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 1000px;
+    /* Hint to the browser for layout */
+  }
+
+  /* Exceptions for sections that are normally in view immediately or have issues with lazy rendering */
+  #home {
+    content-visibility: visible;
+  }
 }
 
 @layer components {

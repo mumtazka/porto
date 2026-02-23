@@ -122,6 +122,8 @@ export default function Hero() {
                     src="/mumtaz-photo.jpg"
                     alt="Mumtaz Kholafiyan Alfan"
                     className="w-full h-full object-cover object-top"
+                    loading="eager"
+                    fetchPriority="high"
                   />
 
                   {/* Border Gradient */}

@@ -108,10 +108,11 @@ GUIDELINES:
 }
 
 async function callLunaAPI(userMessage: string): Promise<string> {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-  if (!apiKey || apiKey === 'your_gemini_api_key_here') {
-    console.warn('API key not configured, using fallback responses');
+  if (!supabaseUrl || !anonKey) {
+    console.warn('Supabase config missing, using fallback responses');
     return getFallbackResponse(userMessage);
   }
 
@@ -119,44 +120,30 @@ async function callLunaAPI(userMessage: string): Promise<string> {
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      `${supabaseUrl}/functions/v1/chat-luna`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${anonKey}`,
+        },
         body: JSON.stringify({
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: `${systemPrompt}\n\nUser message: ${userMessage}` }],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.9,
-            topK: 50,
-            topP: 0.95,
-            maxOutputTokens: 600,
-          },
+          userMessage,
+          systemPrompt,
         }),
       }
     );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('API error:', response.status, errorText);
+      console.error('Edge function error:', response.status, errorText);
       return getFallbackResponse(userMessage);
     }
 
     const data = await response.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!text) {
-      console.error('No text in response:', JSON.stringify(data));
-      return getFallbackResponse(userMessage);
-    }
-
-    return text.trim();
+    return data?.text || getFallbackResponse(userMessage);
   } catch (error) {
-    console.error('Error calling API:', error);
+    console.error('Error calling edge function:', error);
     return getFallbackResponse(userMessage);
   }
 }

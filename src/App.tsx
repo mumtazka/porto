@@ -1,5 +1,5 @@
 
-import AIChatbot from './components/AIChatbot';
+import { Suspense, lazy } from 'react';
 import ScrollEngine from './components/ScrollEngine';
 import Hero from './sections/Hero';
 import TechCarousel from './sections/TechCarousel';
@@ -7,7 +7,9 @@ import Projects from './sections/Projects';
 import GitHubContributions from './sections/GitHubContributions';
 import Education from './sections/Education';
 import Contact from './sections/Contact';
-import Admin from './pages/Admin';
+
+const Admin = lazy(() => import('./pages/Admin'));
+const AIChatbot = lazy(() => import('./components/AIChatbot'));
 
 function HomePage() {
   return (
@@ -26,7 +28,9 @@ function HomePage() {
         <div className="section-divider" />
         <Contact />
       </main>
-      <AIChatbot />
+      <Suspense fallback={null}>
+        <AIChatbot />
+      </Suspense>
     </>
   );
 }
@@ -34,7 +38,11 @@ function HomePage() {
 function App() {
   // Check URL for admin route
   if (window.location.pathname === '/admin') {
-    return <Admin />;
+    return (
+      <Suspense fallback={<div className="flex h-screen w-full items-center justify-center bg-background text-foreground">Loading Admin...</div>}>
+        <Admin />
+      </Suspense>
+    );
   }
 
   return <HomePage />;

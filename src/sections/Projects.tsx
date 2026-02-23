@@ -35,6 +35,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
             src={project.image_url}
             alt={project.title}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-transparent to-transparent opacity-80" />
         </div>
@@ -123,6 +124,7 @@ function FeaturedProjectCard({ project, onClick }: { project: Project; onClick: 
             src={project.image_url}
             alt={project.title}
             className="w-full h-full object-cover transform transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-110 group-hover:rotate-1"
+            loading="lazy"
           />
 
           {/* Featured Badge */}
