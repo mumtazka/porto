@@ -339,12 +339,10 @@ export default function AIChatbot() {
           aria-label="Open Luna AI Chat"
         >
           <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-orange-400 via-amber-400 to-cyan-400 blur-md opacity-60" />
-          <div className="absolute inset-0 rounded-full bg-orange-500 animate-ping opacity-25" />
           <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 ring-2 ring-white/70 shadow-[0_12px_28px_rgba(251,146,60,0.45)] transition-transform duration-300 group-hover:scale-110" />
           <div className="relative z-10 w-14 h-14 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
             <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-cyan-200 shadow-[0_0_10px_rgba(34,211,238,0.95)]" />
             <Bot className="w-6 h-6 text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)]" />
-            <Sparkles className="absolute -left-1 -top-1 w-4 h-4 text-amber-100 drop-shadow-[0_2px_4px_rgba(0,0,0,0.35)]" />
           </div>
           <div className="absolute -top-1 -right-1 z-20 px-2 py-0.5 bg-cyan-500 text-white text-[10px] font-medium rounded-full shadow-[0_4px_10px_rgba(6,182,212,0.45)]">
             Luna
