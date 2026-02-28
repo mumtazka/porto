@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
-import { 
-  Home, 
-  Code2, 
-  Briefcase, 
-  GraduationCap, 
-  Mail, 
-  Linkedin, 
-  Github, 
-  Instagram, 
-  Twitter, 
+import {
+  Home,
+  Code2,
+  Briefcase,
+  GraduationCap,
+  Mail,
+  Linkedin,
+  Github,
+  Instagram,
+  Twitter,
   Menu,
-  X,
-  MessageCircle
+  X
 } from 'lucide-react';
+import { WhatsappIcon } from './icons/WhatsappIcon';
 
 interface NavItem {
   id: string;
@@ -33,7 +33,7 @@ const socialLinks = [
   { icon: Github, href: 'https://github.com', label: 'GitHub' },
   { icon: Instagram, href: 'https://instagram.com', label: 'Instagram' },
   { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
-  { icon: MessageCircle, href: 'https://wa.me', label: 'WhatsApp' },
+  { icon: WhatsappIcon, href: 'https://wa.me', label: 'WhatsApp' },
 ];
 
 export default function Sidebar() {
@@ -88,20 +88,19 @@ export default function Sidebar() {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
-            
+
             return (
               <button
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
-                className={`group relative p-3 rounded-xl transition-all duration-300 ${
-                  isActive 
-                    ? 'bg-orange-500 text-white shadow-glow' 
+                className={`group relative p-3 rounded-xl transition-all duration-300 ${isActive
+                    ? 'bg-orange-500 text-white shadow-glow'
                     : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
-                }`}
+                  }`}
                 aria-label={item.label}
               >
                 <Icon className="w-5 h-5" />
-                
+
                 {/* Tooltip */}
                 <span className="absolute left-full ml-3 px-3 py-1 bg-charcoal text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap z-50">
                   {item.label}
@@ -132,9 +131,8 @@ export default function Sidebar() {
       </aside>
 
       {/* Mobile Header */}
-      <header className={`lg:hidden fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
-      }`}>
+      <header className={`lg:hidden fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
+        }`}>
         <div className="flex items-center justify-between px-4 py-3">
           {/* Logo */}
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-glow">
@@ -158,16 +156,15 @@ export default function Sidebar() {
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeSection === item.id;
-                
+
                 return (
                   <button
                     key={item.id}
                     onClick={() => scrollToSection(item.id)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-                      isActive 
-                        ? 'bg-orange-500 text-white' 
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${isActive
+                        ? 'bg-orange-500 text-white'
                         : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
-                    }`}
+                      }`}
                   >
                     <Icon className="w-5 h-5" />
                     <span className="font-medium">{item.label}</span>
@@ -204,16 +201,15 @@ export default function Sidebar() {
           {navItems.slice(0, 5).map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
-            
+
             return (
               <button
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
-                className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-300 ${
-                  isActive 
-                    ? 'text-orange-500' 
+                className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-300 ${isActive
+                    ? 'text-orange-500'
                     : 'text-gray-400 hover:text-orange-400'
-                }`}
+                  }`}
               >
                 <Icon className={`w-5 h-5 ${isActive ? 'scale-110' : ''}`} />
                 <span className="text-[10px] font-medium">{item.label}</span>

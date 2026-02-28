@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Mail, MapPin, Phone, Linkedin, Github, Instagram, Twitter, MessageCircle, Heart, CheckCircle, Loader2 } from 'lucide-react';
+import { Send, Mail, MapPin, Phone, Linkedin, Github, Instagram, Twitter, Heart, CheckCircle, Loader2 } from 'lucide-react';
+import { WhatsappIcon } from '../components/icons/WhatsappIcon';
 import { useMessages } from '../hooks/useSupabase';
 
 interface FormData {
@@ -19,7 +20,7 @@ const socialLinks = [
   { icon: Github, href: 'https://github.com', label: 'GitHub', color: 'hover:bg-[#333] hover:text-white hover:border-[#333]' },
   { icon: Instagram, href: 'https://instagram.com', label: 'Instagram', color: 'hover:bg-[#E4405F] hover:text-white hover:border-[#E4405F]' },
   { icon: Twitter, href: 'https://twitter.com', label: 'Twitter', color: 'hover:bg-[#1DA1F2] hover:text-white hover:border-[#1DA1F2]' },
-  { icon: MessageCircle, href: 'https://wa.me', label: 'WhatsApp', color: 'hover:bg-[#25D366] hover:text-white hover:border-[#25D366]' },
+  { icon: WhatsappIcon, href: 'https://wa.me', label: 'WhatsApp', color: 'hover:bg-[#25D366] hover:text-white hover:border-[#25D366]' },
 ];
 
 export default function Contact() {
