@@ -48,12 +48,21 @@ export async function onRequestPost({ env }) {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
+        'User-Agent': 'porto-app/1.0',
       },
       body: JSON.stringify({
         query,
         variables: { username: GITHUB_USERNAME },
       }),
     });
+
+    if (!response.ok) {
+      const text = await response.text();
+      return new Response(JSON.stringify({ error: `GitHub API ${response.status}: ${text}` }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     const data = await response.json();
 

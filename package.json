@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "pages:dev": "npx wrangler pages dev . -- vite --port 5173",
+    "pages:dev": "npx wrangler pages dev -- vite --port 5173",
     "pages:deploy": "npm run build && npx wrangler pages deploy dist"
   },
   "dependencies": {
