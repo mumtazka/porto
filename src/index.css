@@ -393,7 +393,7 @@
   top: 0;
   left: 0;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 999999;
   will-change: transform;
 }
 
@@ -501,7 +501,7 @@
   height: 6px;
   border-radius: 50%;
   background: #F97316;
-  z-index: 10000;
+  z-index: 999999;
   transition: opacity 0.3s, background 0.3s, box-shadow 0.3s;
 }
 

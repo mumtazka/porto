@@ -41,7 +41,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var LibsqlError;
 var init_api = __esm({
   "../node_modules/@libsql/core/lib-esm/api.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     LibsqlError = class extends Error {
       static {
         __name(this, "LibsqlError");
@@ -157,7 +157,7 @@ function encodeUserinfo(userinfo) {
 var URI_RE, AUTHORITY_RE;
 var init_uri = __esm({
   "../node_modules/@libsql/core/lib-esm/uri.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_api();
     __name(parseUri, "parseUri");
     URI_RE = (() => {
@@ -185,7 +185,7 @@ var init_uri = __esm({
 var version, VERSION, _hasBuffer, _TD, _TE, b64ch, b64chs, b64tab, b64re, _fromCC, _U8Afrom, _mkUriSafe, _tidyB64, btoaPolyfill, _btoa, _fromUint8Array, fromUint8Array, cb_utob, re_utob, utob, _encode, encode, encodeURI2, re_btou, cb_btou, btou, atobPolyfill, _atob, _toUint8Array, toUint8Array, _decode, _unURI, decode, isValid, _noEnum, extendString, extendUint8Array, extendBuiltins, gBase64;
 var init_base64 = __esm({
   "../node_modules/js-base64/base64.mjs"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     version = "3.7.8";
     VERSION = version;
     _hasBuffer = typeof Buffer === "function";
@@ -376,7 +376,7 @@ function valueToJson(value) {
 var supportedUrlLink, ResultSetImpl;
 var init_util = __esm({
   "../node_modules/@libsql/core/lib-esm/util.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_base64();
     supportedUrlLink = "https://github.com/libsql/libsql-client-ts#supported-urls";
     __name(transactionModeToBegin, "transactionModeToBegin");
@@ -518,7 +518,7 @@ function expandConfig(config, preferHttp) {
 var inMemoryMode;
 var init_config = __esm({
   "../node_modules/@libsql/core/lib-esm/config.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_api();
     init_uri();
     init_util();
@@ -531,7 +531,7 @@ var init_config = __esm({
 var _WebSocket;
 var init_web = __esm({
   "../node_modules/@libsql/isomorphic-ws/web.mjs"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     if (typeof WebSocket !== "undefined") {
       _WebSocket = WebSocket;
     } else if (typeof global !== "undefined") {
@@ -548,7 +548,7 @@ var init_web = __esm({
 var Client;
 var init_client = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/client.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     Client = class {
       static {
         __name(this, "Client");
@@ -571,7 +571,7 @@ var init_client = __esm({
 var ClientError, ProtoError, ResponseError, ClosedError, WebSocketUnsupportedError, WebSocketError, HttpServerError, ProtocolVersionError, InternalError, MisuseError;
 var init_errors = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/errors.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     ClientError = class extends Error {
       static {
         __name(this, "ClientError");
@@ -747,7 +747,7 @@ function readJsonObject(value, fun) {
 }
 var init_decode = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/encoding/json/decode.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_errors();
     __name(string, "string");
     __name(stringOpt, "stringOpt");
@@ -773,7 +773,7 @@ function writeJsonObject(value, fun) {
 var ObjectWriter;
 var init_encode = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/encoding/json/encode.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     ObjectWriter = class {
       static {
         __name(this, "ObjectWriter");
@@ -848,7 +848,7 @@ var init_encode = __esm({
 var VARINT, FIXED_64, LENGTH_DELIMITED, FIXED_32;
 var init_util2 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/encoding/protobuf/util.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     VARINT = 0;
     FIXED_64 = 1;
     LENGTH_DELIMITED = 2;
@@ -880,7 +880,7 @@ function readProtobufMessage(data, def) {
 var MessageReader, FieldReader;
 var init_decode2 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/encoding/protobuf/decode.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_errors();
     init_util2();
     MessageReader = class {
@@ -1025,7 +1025,7 @@ function writeProtobufMessage(value, fun) {
 var MessageWriter;
 var init_encode2 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/encoding/protobuf/encode.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_util2();
     MessageWriter = class _MessageWriter {
       static {
@@ -1126,7 +1126,7 @@ var init_encode2 = __esm({
 // ../node_modules/@libsql/hrana-client/lib-esm/encoding/index.js
 var init_encoding = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/encoding/index.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_decode();
     init_encode();
     init_decode2();
@@ -1138,7 +1138,7 @@ var init_encoding = __esm({
 var IdAlloc;
 var init_id_alloc = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/id_alloc.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_errors();
     IdAlloc = class {
       static {
@@ -1185,7 +1185,7 @@ function impossible(value, message) {
 }
 var init_util3 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/util.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_errors();
     __name(impossible, "impossible");
   }
@@ -1253,7 +1253,7 @@ function valueFromProto(value, intMode) {
 var minInteger, maxInteger;
 var init_value = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/value.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_errors();
     init_util3();
     __name(valueToProto, "valueToProto");
@@ -1311,7 +1311,7 @@ function errorFromProto(error) {
 }
 var init_result = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/result.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_errors();
     init_value();
     __name(stmtResultFromProto, "stmtResultFromProto");
@@ -1334,7 +1334,7 @@ function sqlToProto(owner, sql) {
 var Sql;
 var init_sql = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/sql.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_errors();
     Sql = class {
       static {
@@ -1382,7 +1382,7 @@ var init_sql = __esm({
 var Queue;
 var init_queue = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/queue.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     Queue = class {
       static {
         __name(this, "Queue");
@@ -1442,7 +1442,7 @@ function stmtToProto(sqlOwner, stmt, wantRows) {
 var Stmt;
 var init_stmt = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/stmt.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_sql();
     init_value();
     Stmt = class {
@@ -1596,7 +1596,7 @@ function checkCondBatch(expectedBatch, cond) {
 var Batch, BatchStep, BatchCond;
 var init_batch = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/batch.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_errors();
     init_result();
     init_stmt();
@@ -1782,7 +1782,7 @@ function describeResultFromProto(result) {
 }
 var init_describe = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/describe.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     __name(describeResultFromProto, "describeResultFromProto");
   }
 });
@@ -1791,7 +1791,7 @@ var init_describe = __esm({
 var Stream;
 var init_stream = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/stream.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_batch();
     init_describe();
     init_result();
@@ -1858,7 +1858,7 @@ var init_stream = __esm({
 var Cursor;
 var init_cursor = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/cursor.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     Cursor = class {
       static {
         __name(this, "Cursor");
@@ -1871,7 +1871,7 @@ var init_cursor = __esm({
 var fetchChunkSize, fetchQueueSize, WsCursor;
 var init_cursor2 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/ws/cursor.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_errors();
     init_cursor();
     init_queue();
@@ -1961,7 +1961,7 @@ var init_cursor2 = __esm({
 var WsStream;
 var init_stream2 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/ws/stream.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_errors();
     init_queue();
     init_stream();
@@ -2232,7 +2232,7 @@ function Value(w, msg) {
 }
 var init_json_encode = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/shared/json_encode.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_base64();
     init_util3();
     __name(Stmt2, "Stmt");
@@ -2308,7 +2308,7 @@ function Request2(w, msg) {
 }
 var init_json_encode2 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/ws/json_encode.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_json_encode();
     init_util3();
     __name(ClientMsg, "ClientMsg");
@@ -2389,7 +2389,7 @@ function Empty(_w, _msg) {
 }
 var init_protobuf_encode = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/shared/protobuf_encode.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_util3();
     __name(Stmt3, "Stmt");
     __name(NamedArg2, "NamedArg");
@@ -2504,7 +2504,7 @@ function GetAutocommitReq(w, msg) {
 }
 var init_protobuf_encode2 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/ws/protobuf_encode.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_protobuf_encode();
     init_util3();
     __name(ClientMsg2, "ClientMsg");
@@ -2619,7 +2619,7 @@ function Value3(obj) {
 }
 var init_json_decode = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/shared/json_decode.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_base64();
     init_errors();
     init_decode();
@@ -2693,7 +2693,7 @@ function Response2(obj) {
 }
 var init_json_decode2 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/ws/json_decode.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_errors();
     init_decode();
     init_json_decode();
@@ -2706,7 +2706,7 @@ var init_json_decode2 = __esm({
 var Error3, StmtResult2, Col2, Row, BatchResult2, BatchResultStepResult, BatchResultStepError, CursorEntry2, StepBeginEntry, StepEndEntry, StepErrorEntry, DescribeResult2, DescribeParam2, DescribeCol2, Value4;
 var init_protobuf_decode = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/shared/protobuf_decode.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     Error3 = {
       default() {
         return { message: "", code: void 0 };
@@ -2923,7 +2923,7 @@ var init_protobuf_decode = __esm({
 var ServerMsg2, HelloErrorMsg, ResponseErrorMsg, ResponseOkMsg, ExecuteResp, BatchResp, FetchCursorResp, DescribeResp, GetAutocommitResp;
 var init_protobuf_decode2 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/ws/protobuf_decode.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_protobuf_decode();
     ServerMsg2 = {
       default() {
@@ -3059,7 +3059,7 @@ var init_protobuf_decode2 = __esm({
 var subprotocolsV2, subprotocolsV3, WsClient;
 var init_client2 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/ws/client.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_client();
     init_encoding();
     init_errors();
@@ -3366,7 +3366,7 @@ var init_client2 = __esm({
 var _fetch, _Request, _Headers;
 var init_web2 = __esm({
   "../node_modules/@libsql/isomorphic-fetch/web.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     _fetch = fetch;
     _Request = Request;
     _Headers = Headers;
@@ -3377,7 +3377,7 @@ var init_web2 = __esm({
 var _queueMicrotask;
 var init_queue_microtask = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/queue_microtask.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     if (typeof queueMicrotask !== "undefined") {
       _queueMicrotask = queueMicrotask;
     } else {
@@ -3393,7 +3393,7 @@ var init_queue_microtask = __esm({
 var ByteQueue;
 var init_byte_queue = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/byte_queue.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     ByteQueue = class {
       static {
         __name(this, "ByteQueue");
@@ -3495,7 +3495,7 @@ function CursorRespBody(obj) {
 }
 var init_json_decode3 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/http/json_decode.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_errors();
     init_decode();
     init_json_decode();
@@ -3510,7 +3510,7 @@ var init_json_decode3 = __esm({
 var PipelineRespBody2, StreamResult2, StreamResponse2, ExecuteStreamResp, BatchStreamResp, DescribeStreamResp, GetAutocommitStreamResp, CursorRespBody2;
 var init_protobuf_decode3 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/http/protobuf_decode.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_protobuf_decode();
     PipelineRespBody2 = {
       default() {
@@ -3616,7 +3616,7 @@ var init_protobuf_decode3 = __esm({
 var HttpCursor;
 var init_cursor3 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/http/cursor.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_byte_queue();
     init_cursor();
     init_decode();
@@ -3799,7 +3799,7 @@ function CursorReqBody(w, msg) {
 }
 var init_json_encode3 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/http/json_encode.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_json_encode();
     init_util3();
     __name(PipelineReqBody, "PipelineReqBody");
@@ -3879,7 +3879,7 @@ function CursorReqBody2(w, msg) {
 }
 var init_protobuf_encode3 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/http/protobuf_encode.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_protobuf_encode();
     init_util3();
     __name(PipelineReqBody2, "PipelineReqBody");
@@ -3953,7 +3953,7 @@ async function errorFromResponse(resp) {
 var HttpStream;
 var init_stream3 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/http/stream.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_web2();
     init_errors();
     init_encoding();
@@ -4275,7 +4275,7 @@ async function findEndpoint(customFetch, clientUrl) {
 var checkEndpoints, fallbackEndpoint, HttpClient;
 var init_client3 = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/http/client.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_web2();
     init_client();
     init_errors();
@@ -4390,7 +4390,7 @@ var init_client3 = __esm({
 // ../node_modules/@libsql/hrana-client/lib-esm/libsql_url.js
 var init_libsql_url = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/libsql_url.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_errors();
   }
 });
@@ -4414,7 +4414,7 @@ function openHttp(url, jwt, customFetch, protocolVersion = 2) {
 }
 var init_lib_esm = __esm({
   "../node_modules/@libsql/hrana-client/lib-esm/index.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_web();
     init_client2();
     init_errors();
@@ -4529,7 +4529,7 @@ function mapHranaErrorCode(e) {
 var HranaTransaction;
 var init_hrana = __esm({
   "../node_modules/@libsql/client/lib-esm/hrana.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_lib_esm();
     init_api();
     init_util();
@@ -4696,7 +4696,7 @@ var init_hrana = __esm({
 var SqlCache, Lru;
 var init_sql_cache = __esm({
   "../node_modules/@libsql/client/lib-esm/sql_cache.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     SqlCache = class {
       static {
         __name(this, "SqlCache");
@@ -4791,7 +4791,7 @@ var init_sql_cache = __esm({
 // ../node_modules/promise-limit/index.js
 var require_promise_limit = __commonJS({
   "../node_modules/promise-limit/index.js"(exports, module) {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     function limiter(count) {
       var outstanding = 0;
       var jobs = [];
@@ -4907,7 +4907,7 @@ function _createClient(config) {
 var import_promise_limit, maxConnAgeMillis, sqlCacheCapacity, WsClient2, WsTransaction;
 var init_ws = __esm({
   "../node_modules/@libsql/client/lib-esm/ws.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_lib_esm();
     init_api();
     init_config();
@@ -5166,7 +5166,7 @@ function _createClient2(config) {
 var import_promise_limit2, sqlCacheCapacity2, HttpClient2, HttpTransaction;
 var init_http = __esm({
   "../node_modules/@libsql/client/lib-esm/http.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_lib_esm();
     init_api();
     init_config();
@@ -5347,7 +5347,7 @@ function _createClient3(config) {
 }
 var init_web3 = __esm({
   "../node_modules/@libsql/client/lib-esm/web.js"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_api();
     init_config();
     init_util();
@@ -5414,7 +5414,7 @@ async function onRequestDelete({ env, params }) {
 var corsHeaders;
 var init_id = __esm({
   "api/achievements/[id].ts"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_web3();
     __name(sqlValue, "sqlValue");
     __name(getDb, "getDb");
@@ -5489,7 +5489,7 @@ async function onRequestDelete2({ env, params }) {
 var corsHeaders2;
 var init_id2 = __esm({
   "api/chat-sessions/[id].ts"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_web3();
     __name(sqlValue2, "sqlValue");
     __name(getDb2, "getDb");
@@ -5561,7 +5561,7 @@ async function onRequestDelete3({ env, params }) {
 var corsHeaders3;
 var init_id3 = __esm({
   "api/education/[id].ts"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_web3();
     __name(sqlValue3, "sqlValue");
     __name(getDb3, "getDb");
@@ -5602,7 +5602,7 @@ async function onRequestDelete4({ env, params }) {
 var corsHeaders4;
 var init_id4 = __esm({
   "api/messages/[id].ts"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_web3();
     __name(getDb4, "getDb");
     corsHeaders4 = {
@@ -5680,7 +5680,7 @@ async function onRequestDelete5({ env, params }) {
 var corsHeaders5;
 var init_id5 = __esm({
   "api/projects/[id].ts"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_web3();
     __name(sqlValue4, "sqlValue");
     __name(getDb5, "getDb");
@@ -5777,7 +5777,7 @@ async function onRequestDelete6({ env, params }) {
 var corsHeaders6;
 var init_achievements = __esm({
   "api/achievements/index.ts"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_web3();
     __name(sqlValue5, "sqlValue");
     __name(getDb6, "getDb");
@@ -5875,7 +5875,7 @@ async function onRequestDelete7({ env, params }) {
 var corsHeaders7;
 var init_chat_sessions = __esm({
   "api/chat-sessions/index.ts"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_web3();
     __name(sqlValue6, "sqlValue");
     __name(getDb7, "getDb");
@@ -5975,7 +5975,7 @@ async function onRequestDelete8({ env, params }) {
 var corsHeaders8;
 var init_education = __esm({
   "api/education/index.ts"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_web3();
     __name(sqlValue7, "sqlValue");
     __name(getDb8, "getDb");
@@ -6041,7 +6041,7 @@ async function onRequestDelete9({ env, params }) {
 var corsHeaders9;
 var init_messages = __esm({
   "api/messages/index.ts"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_web3();
     __name(getDb9, "getDb");
     __name(generateId4, "generateId");
@@ -6119,7 +6119,7 @@ async function onRequestPost5({ env, request }) {
 var corsHeaders10;
 var init_personal_context = __esm({
   "api/personal-context/index.ts"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_web3();
     __name(sqlValue8, "sqlValue");
     __name(getDb10, "getDb");
@@ -6231,7 +6231,7 @@ async function onRequestDelete10({ env, params }) {
 var corsHeaders11;
 var init_projects = __esm({
   "api/projects/index.ts"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_web3();
     __name(sqlValue9, "sqlValue");
     __name(getDb11, "getDb");
@@ -6274,7 +6274,7 @@ async function onRequestGet11({ env }) {
 var corsHeaders12;
 var init_tech_stack = __esm({
   "api/tech-stack/index.ts"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     init_web3();
     __name(getDb12, "getDb");
     corsHeaders12 = {
@@ -6326,7 +6326,7 @@ async function onRequestPost7({ env, request }) {
 var corsHeaders13;
 var init_admin_login = __esm({
   "admin-login/index.ts"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     corsHeaders13 = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -6358,12 +6358,12 @@ async function onRequestPost8({ env, request }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          systemInstruction: {
+            parts: [{ text: systemPrompt }]
+          },
           contents: [
             {
-              role: "user",
-              parts: [{ text: `${systemPrompt}
-
-User message: ${userMessage}` }]
+              parts: [{ text: userMessage }]
             }
           ],
           generationConfig: {
@@ -6376,7 +6376,14 @@ User message: ${userMessage}` }]
       }
     );
     const responseData = await response.json();
-    const text = responseData?.candidates?.[0]?.content?.parts?.[0]?.text || "I'm a bit lost, could you rephrase that? \u{1F605}";
+    if (!response.ok) {
+      const errMsg = responseData?.error?.message || JSON.stringify(responseData);
+      return new Response(JSON.stringify({ error: `Gemini API ${response.status}: ${errMsg}` }), {
+        status: 400,
+        headers: { ...corsHeaders14, "Content-Type": "application/json" }
+      });
+    }
+    const text = responseData?.candidates?.[0]?.content?.parts?.[0]?.text || "";
     return new Response(JSON.stringify({ text }), {
       headers: { ...corsHeaders14, "Content-Type": "application/json" }
     });
@@ -6391,7 +6398,7 @@ User message: ${userMessage}` }]
 var corsHeaders14;
 var init_chat_luna = __esm({
   "chat-luna/index.ts"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     corsHeaders14 = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Headers": "Content-Type, Authorization"
@@ -6448,7 +6455,7 @@ async function onRequestPost9({ env }) {
 var GITHUB_USERNAME, query, corsHeaders15;
 var init_github_contributions = __esm({
   "github-contributions/index.ts"() {
-    init_functionsRoutes_0_3214042023542826();
+    init_functionsRoutes_0_9245401853933674();
     GITHUB_USERNAME = "mumtazka";
     query = `
   query($username: String!) {
@@ -6482,10 +6489,10 @@ var init_github_contributions = __esm({
   }
 });
 
-// ../.wrangler/tmp/pages-EnMLLb/functionsRoutes-0.3214042023542826.mjs
+// ../.wrangler/tmp/pages-4z2Kqj/functionsRoutes-0.9245401853933674.mjs
 var routes;
-var init_functionsRoutes_0_3214042023542826 = __esm({
-  "../.wrangler/tmp/pages-EnMLLb/functionsRoutes-0.3214042023542826.mjs"() {
+var init_functionsRoutes_0_9245401853933674 = __esm({
+  "../.wrangler/tmp/pages-4z2Kqj/functionsRoutes-0.9245401853933674.mjs"() {
     init_id();
     init_id();
     init_id();
@@ -6915,17 +6922,17 @@ var init_functionsRoutes_0_3214042023542826 = __esm({
   }
 });
 
-// ../.wrangler/tmp/bundle-zBPZLR/middleware-loader.entry.ts
-init_functionsRoutes_0_3214042023542826();
+// ../.wrangler/tmp/bundle-H36XEo/middleware-loader.entry.ts
+init_functionsRoutes_0_9245401853933674();
 
-// ../.wrangler/tmp/bundle-zBPZLR/middleware-insertion-facade.js
-init_functionsRoutes_0_3214042023542826();
+// ../.wrangler/tmp/bundle-H36XEo/middleware-insertion-facade.js
+init_functionsRoutes_0_9245401853933674();
 
 // ../../../.npm-global/lib/node_modules/wrangler/templates/pages-template-worker.ts
-init_functionsRoutes_0_3214042023542826();
+init_functionsRoutes_0_9245401853933674();
 
 // ../../../.npm-global/lib/node_modules/wrangler/node_modules/path-to-regexp/dist.es2015/index.js
-init_functionsRoutes_0_3214042023542826();
+init_functionsRoutes_0_9245401853933674();
 function lexer(str) {
   var tokens = [];
   var i = 0;
@@ -7372,7 +7379,7 @@ var cloneResponse = /* @__PURE__ */ __name((response) => (
 ), "cloneResponse");
 
 // ../../../.npm-global/lib/node_modules/wrangler/templates/middleware/middleware-ensure-req-body-drained.ts
-init_functionsRoutes_0_3214042023542826();
+init_functionsRoutes_0_9245401853933674();
 var drainBody = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx) => {
   try {
     return await middlewareCtx.next(request, env);
@@ -7391,7 +7398,7 @@ var drainBody = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 var middleware_ensure_req_body_drained_default = drainBody;
 
 // ../../../.npm-global/lib/node_modules/wrangler/templates/middleware/middleware-miniflare3-json-error.ts
-init_functionsRoutes_0_3214042023542826();
+init_functionsRoutes_0_9245401853933674();
 function reduceError(e) {
   return {
     name: e?.name,
@@ -7420,7 +7427,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// ../.wrangler/tmp/bundle-zBPZLR/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-H36XEo/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -7428,7 +7435,7 @@ var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
 var middleware_insertion_facade_default = pages_template_worker_default;
 
 // ../../../.npm-global/lib/node_modules/wrangler/templates/middleware/common.ts
-init_functionsRoutes_0_3214042023542826();
+init_functionsRoutes_0_9245401853933674();
 var __facade_middleware__ = [];
 function __facade_register__(...args) {
   __facade_middleware__.push(...args.flat());
@@ -7453,7 +7460,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// ../.wrangler/tmp/bundle-zBPZLR/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-H36XEo/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;
@@ -7555,4 +7562,4 @@ export {
   __INTERNAL_WRANGLER_MIDDLEWARE__,
   middleware_loader_entry_default as default
 };
-//# sourceMappingURL=functionsWorker-0.5973106200583557.mjs.map
+//# sourceMappingURL=functionsWorker-0.31280136006947845.mjs.map

@@ -25,10 +25,12 @@ export async function onRequestPost({ env, request }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          systemInstruction: {
+            parts: [{ text: systemPrompt }],
+          },
           contents: [
             {
-              role: 'user',
-              parts: [{ text: `${systemPrompt}\n\nUser message: ${userMessage}` }],
+              parts: [{ text: userMessage }],
             },
           ],
           generationConfig: {
@@ -42,9 +44,16 @@ export async function onRequestPost({ env, request }) {
     );
 
     const responseData = await response.json();
-    const text =
-      responseData?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "I'm a bit lost, could you rephrase that? 😅";
+
+    if (!response.ok) {
+      const errMsg = responseData?.error?.message || JSON.stringify(responseData);
+      return new Response(JSON.stringify({ error: `Gemini API ${response.status}: ${errMsg}` }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const text = responseData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
     return new Response(JSON.stringify({ text }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
