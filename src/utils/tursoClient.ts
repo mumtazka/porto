@@ -34,7 +34,3 @@ export const tursoApi = {
 };
 
 export const isTursoConfigured = () => isConfigured;
-
-export const mockProjects: unknown[] = [];
-export const mockEducation: unknown[] = [];
-export const mockAchievements: unknown[] = [];
