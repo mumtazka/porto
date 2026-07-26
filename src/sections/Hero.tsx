@@ -1,18 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ArrowRight, MapPin, Download, Code, Database, Layout, Server } from 'lucide-react';
 import { useTypingAnimation } from '../hooks/useScrollAnimation';
 
 export default function Hero() {
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded] = useState(true);
   const { displayedText, isComplete } = useTypingAnimation(
     'I build scalable web applications and create exceptional digital experiences. Passionate about clean code, modern technologies, and solving complex problems.',
     30,
     500
   );
-
-  useEffect(() => {
-    setIsLoaded(true);
-  }, []);
 
   const scrollToProjects = () => {
     const element = document.getElementById('projects');

@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { supabase } from '../utils/supabaseClient';
+import { tursoApi, isTursoConfigured } from '../utils/tursoClient';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -25,10 +25,10 @@ const LOGO_MAP: Record<string, React.ReactNode> = {
       <path d="M128 0Q96 0 80 32q24-16 48 0c16 10.667 24 26.667 48 32q48 16 80-32-24 16-48 0C192 21.333 184 5.333 160 0H128zm-48 80Q48 80 32 112q24-16 48 0c16 10.667 24 26.667 48 32q48 16 80-32-24 16-48 0c-16-10.667-24-26.667-48-32H80z" />
     </svg>
   ),
-  supabase: (
+  turso: (
     <svg viewBox="0 0 109 113" className="h-7 w-7" fill="currentColor">
       <path d="M63.708 110.284c-2.86 3.601-8.658 1.628-8.727-2.97l-1.007-67.251h45.22c8.19 0 12.758 9.46 7.665 15.874l-43.15 54.347z" fillOpacity=".6" />
-      <path d="M45.317 2.071c2.86-3.601 8.657-1.628 8.726 2.97l.442 67.251H9.83c-8.19 0-12.759-9.46-7.665-15.875L45.317 2.072z" />
+      <path d="M45.317 2.071c2.86-3.601 8.657-1.628 8.726 2.97l.442 67.251H9.83c-8.19 0-12.759-9.46-7.665-15.875L45.317 2.072z" fill="#4FF8D2" />
     </svg>
   ),
   git: (
@@ -133,15 +133,15 @@ export default function TechCarousel() {
 
   const fetchTechStack = async () => {
     try {
-      const { data, error } = await supabase
-        .from('tech_stack')
-        .select('*')
-        .order('id');
+      if (!isTursoConfigured()) {
+        setTechStack([]);
+        setLoading(false);
+        return;
+      }
 
-      if (error) {
-        console.error('Error fetching tech stack:', error);
-      } else {
-        setTechStack(data || []);
+      const data = await tursoApi.get<TechItem[]>('/api/tech-stack');
+      if (data) {
+        setTechStack(data);
       }
     } catch (error) {
       console.error('Unexpected error:', error);

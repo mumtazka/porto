@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { GraduationCap, Trophy, ExternalLink, Calendar } from 'lucide-react';
-import { useEducation, useAchievements } from '../hooks/useSupabase';
+import { useEducation, useAchievements } from '../hooks/useTurso';
+import type { Education, Achievement } from '../types/database';
 
 function formatYear(dateString: string): string {
   return new Date(dateString).getFullYear().toString();
@@ -25,7 +26,7 @@ function useReveal() {
 }
 
 /* ─── Education Entry ───────────────────────────────────────────────────── */
-function EduEntry({ edu, index }: { edu: any; index: number }) {
+function EduEntry({ edu, index }: { edu: Education; index: number }) {
   const { ref, visible } = useReveal();
 
   return (
@@ -97,7 +98,7 @@ function EduEntry({ edu, index }: { edu: any; index: number }) {
 }
 
 /* ─── Achievement Card ──────────────────────────────────────────────────── */
-function AchievementCard({ ach, index }: { ach: any; index: number }) {
+function AchievementCard({ ach, index }: { ach: Achievement; index: number }) {
   const { ref, visible } = useReveal();
 
   return (

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Send, Bot, User, Sparkles } from 'lucide-react';
-import { getPersonalContext } from '../hooks/useSupabase';
+import { getPersonalContext } from '../hooks/useTurso';
 import { createChatSessionQuery, addChatMessageQuery } from '../hooks/useChatQuery';
 import type { ChatMessage } from '../types/database';
 
@@ -32,7 +32,9 @@ function buildSystemPrompt(): string {
         .map(p => `  - ${p.title}${p.featured ? ' ⭐' : ''}: ${p.description} [Tech: ${p.tech_stack.join(', ')}]`)
         .join('\n');
     }
-  } catch { }
+  } catch {
+    projectsText = '';
+  }
 
   let educationText = '';
   try {
@@ -43,7 +45,9 @@ function buildSystemPrompt(): string {
         .map(e => `  - ${e.degree} in ${e.field} @ ${e.institution} (${e.start_date.slice(0, 4)}–${e.end_date.slice(0, 4)})`)
         .join('\n');
     }
-  } catch { }
+  } catch {
+    educationText = '';
+  }
 
   let achievementsText = '';
   try {
@@ -54,7 +58,9 @@ function buildSystemPrompt(): string {
         .map(a => `  - ${a.title} by ${a.issuer} (${a.date.slice(0, 4)})`)
         .join('\n');
     }
-  } catch { }
+  } catch {
+    achievementsText = '';
+  }
 
   return `You are Luna, a friendly and laid-back AI assistant living on ${ctx.name}'s portfolio website. You have a warm, witty, and relaxed personality — like a smart friend who happens to know a lot about ${ctx.name}.
 
@@ -108,24 +114,15 @@ GUIDELINES:
 }
 
 async function callLunaAPI(userMessage: string): Promise<string> {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !anonKey) {
-    console.warn('Supabase config missing, using fallback responses');
-    return getFallbackResponse(userMessage);
-  }
-
   const systemPrompt = buildSystemPrompt();
 
   try {
     const response = await fetch(
-      `${supabaseUrl}/functions/v1/chat-luna`,
+      '/chat-luna',
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${anonKey}`,
         },
         body: JSON.stringify({
           userMessage,
@@ -136,14 +133,14 @@ async function callLunaAPI(userMessage: string): Promise<string> {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Edge function error:', response.status, errorText);
+      console.error('API error:', response.status, errorText);
       return getFallbackResponse(userMessage);
     }
 
     const data = await response.json();
     return data?.text || getFallbackResponse(userMessage);
   } catch (error) {
-    console.error('Error calling edge function:', error);
+    console.error('Error calling Luna API:', error);
     return getFallbackResponse(userMessage);
   }
 }
@@ -178,7 +175,9 @@ function getFallbackResponse(input: string): string {
         const featured = projects.filter(p => p.featured).map(p => p.title);
         if (featured.length) return `Some highlights: ${featured.join(', ')} ⭐ Scroll up to the Projects section for the full breakdown!`;
       }
-    } catch { }
+    } catch {
+      return `${ctx.name} has built some cool stuff! Head over to the Projects section for the full breakdown!`;
+    }
     return `${ctx.name} has built some cool stuff! Head over to the Projects section to check them out 👆`;
   }
   if (lowerInput.includes('education') || lowerInput.includes('degree') || lowerInput.includes('study') || lowerInput.includes('kuliah') || lowerInput.includes('sekolah')) {
@@ -188,7 +187,9 @@ function getFallbackResponse(input: string): string {
         const edu = JSON.parse(raw) as Array<{ institution: string; degree: string }>;
         if (edu.length) return `${ctx.name} studied: ${edu.map(e => `${e.degree} from ${e.institution}`).join('; ')}. Pretty solid background!`;
       }
-    } catch { }
+    } catch {
+      return `${ctx.name} has a strong academic background. Check the Education section for details!`;
+    }
     return `${ctx.name} has a strong academic background. Check the Education section for details!`;
   }
   if (lowerInput.includes('contact') || lowerInput.includes('hire') || lowerInput.includes('email') || lowerInput.includes('hubungi')) {

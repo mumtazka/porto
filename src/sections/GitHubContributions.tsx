@@ -93,26 +93,16 @@ export default function GitHubContributions() {
     // Fetch contribution data from GitHub GraphQL API
     useEffect(() => {
         async function fetchContributions() {
-            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-            const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-            if (!supabaseUrl || !anonKey) {
-                setError('Supabase config missing');
-                setLoading(false);
-                return;
-            }
-
             try {
-                const response = await fetch(`${supabaseUrl}/functions/v1/github-contributions`, {
+                const response = await fetch('/github-contributions', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${anonKey}`,
                         'Content-Type': 'application/json',
                     }
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Edge function error: ${response.status}`);
+                    throw new Error(`API error: ${response.status}`);
                 }
 
                 const data = await response.json();

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { ExternalLink, Github, ArrowRight, X, Layers } from 'lucide-react';
-import { useProjects } from '../hooks/useSupabase';
+import { useProjects } from '../hooks/useTurso';
 import type { Project } from '../types/database';
 
 function ProjectModal({ project, onClose }: { project: Project; onClose: () => void }) {

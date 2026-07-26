@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, Mail, MapPin, Phone, Linkedin, Github, Instagram, Twitter, Heart, CheckCircle, Loader2 } from 'lucide-react';
 import { WhatsappIcon } from '../components/icons/WhatsappIcon';
-import { useMessages } from '../hooks/useSupabase';
+import { useMessages } from '../hooks/useTurso';
 
 interface FormData {
   name: string;

@@ -219,6 +219,25 @@ export interface ChatMessage {
   timestamp: string;
 }
 
+export interface PersonalContext {
+  id?: number;
+  name: string;
+  role: string;
+  location: string;
+  bio: string;
+  email: string;
+  phone: string;
+  linkedin: string;
+  github: string;
+  instagram: string;
+  availability: string;
+  yearsOfExperience: string;
+  skills: string;
+  interests: string;
+  languages: string;
+  extraNotes: string;
+}
+
 export type Project = Database['public']['Tables']['projects']['Row'];
 export type Education = Database['public']['Tables']['education']['Row'];
 export type Message = Database['public']['Tables']['messages']['Row'];

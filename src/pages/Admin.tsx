@@ -25,7 +25,7 @@ import {
   User,
   Bot
 } from 'lucide-react';
-import { useAuth, useProjects, useEducation, useAchievements, useMessages, usePersonalContext, useChatSessions } from '../hooks/useSupabase';
+import { useAuth, useProjects, useEducation, useAchievements, useMessages, usePersonalContext, useChatSessions } from '../hooks/useTurso';
 import type { Project, Education, Achievement } from '../types/database';
 
 const CLOUDINARY_CLOUD_NAME = 'dcf93og8f';
@@ -278,8 +278,8 @@ export default function Admin() {
     try {
       const url = await uploadToCloudinary(file);
       setter(url);
-    } catch (error: any) {
-      alert(`Upload Error: ${error.message}`);
+    } catch (error: unknown) {
+      alert(`Upload Error: ${error instanceof Error ? error.message : 'Unknown upload error'}`);
     } finally {
       setUploadingImage(false);
     }

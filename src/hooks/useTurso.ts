@@ -1,13 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
-import { mockProjects, mockEducation, mockAchievements, isSupabaseConfigured, supabase } from '../utils/supabaseClient';
-import type { Project, Education, Message, Achievement } from '../types/database';
+import { tursoApi, isTursoConfigured } from '../utils/tursoClient';
+import type { Project, Education, Message, Achievement, PersonalContext as PersonalContextType, ChatSession } from '../types/database';
+import { fetchChatSessionsQuery, deleteChatSessionQuery } from './useChatQuery';
 
-// Helper: load from localStorage or fallback
 function loadFromStorage<T>(key: string, fallback: T[]): T[] {
   try {
     const stored = localStorage.getItem(key);
     if (stored) return JSON.parse(stored);
-  } catch { }
+  } catch {
+    return fallback;
+  }
   return fallback;
 }
 
@@ -15,7 +17,6 @@ function saveToStorage<T>(key: string, data: T[]) {
   localStorage.setItem(key, JSON.stringify(data));
 }
 
-// Projects Hook
 export const useProjects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,16 +24,15 @@ export const useProjects = () => {
   const fetchProjects = useCallback(async () => {
     try {
       setLoading(true);
-      if (!isSupabaseConfigured()) {
-        setProjects(loadFromStorage('portfolio_projects', mockProjects));
+      if (!isTursoConfigured()) {
+        setProjects(loadFromStorage<Project>('portfolio_projects', []));
         setLoading(false);
         return;
       }
-      const { data, error } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
-      if (error) throw error;
+      const data = await tursoApi.get<Project[]>('/api/projects');
       setProjects(data || []);
     } catch {
-      setProjects(loadFromStorage('portfolio_projects', mockProjects));
+      setProjects(loadFromStorage<Project>('portfolio_projects', []));
     } finally {
       setLoading(false);
     }
@@ -49,7 +49,7 @@ export const useProjects = () => {
   }, [projects]);
 
   const addProject = async (project: Omit<Project, 'id' | 'created_at'>) => {
-    if (!isSupabaseConfigured()) {
+    if (!isTursoConfigured()) {
       const newProject = {
         ...project,
         id: Math.random().toString(36).substr(2, 9),
@@ -58,19 +58,29 @@ export const useProjects = () => {
       setProjects(prev => [newProject, ...prev]);
       return { data: newProject, error: null };
     }
-    return await supabase.from('projects').insert([project]).select().single();
+    try {
+      const data = await tursoApi.post<Project>('/api/projects', project);
+      return { data, error: null };
+    } catch (error: unknown) {
+      return { data: null, error };
+    }
   };
 
   const updateProject = async (id: string, updates: Partial<Project>) => {
-    if (!isSupabaseConfigured()) {
+    if (!isTursoConfigured()) {
       setProjects(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
       return { error: null };
     }
-    return await supabase.from('projects').update(updates).eq('id', id);
+    try {
+      await tursoApi.patch<Project>(`/api/projects/${id}`, updates);
+      return { error: null };
+    } catch (error: unknown) {
+      return { error };
+    }
   };
 
   const deleteProject = async (id: string) => {
-    if (!isSupabaseConfigured()) {
+    if (!isTursoConfigured()) {
       setProjects(prev => {
         const updated = prev.filter(p => p.id !== id);
         saveToStorage('portfolio_projects', updated);
@@ -78,13 +88,17 @@ export const useProjects = () => {
       });
       return { error: null };
     }
-    return await supabase.from('projects').delete().eq('id', id);
+    try {
+      await tursoApi.delete(`/api/projects/${id}`);
+      return { error: null };
+    } catch (error: unknown) {
+      return { error };
+    }
   };
 
   return { projects, loading, addProject, updateProject, deleteProject, refetch: fetchProjects };
 };
 
-// Education Hook
 export const useEducation = () => {
   const [education, setEducation] = useState<Education[]>([]);
   const [loading, setLoading] = useState(true);
@@ -92,16 +106,15 @@ export const useEducation = () => {
   const fetchEducation = useCallback(async () => {
     try {
       setLoading(true);
-      if (!isSupabaseConfigured()) {
-        setEducation(loadFromStorage('portfolio_education', mockEducation));
+      if (!isTursoConfigured()) {
+        setEducation(loadFromStorage<Education>('portfolio_education', []));
         setLoading(false);
         return;
       }
-      const { data, error } = await supabase.from('education').select('*').order('start_date', { ascending: false });
-      if (error) throw error;
+      const data = await tursoApi.get<Education[]>('/api/education');
       setEducation(data || []);
     } catch {
-      setEducation(loadFromStorage('portfolio_education', mockEducation));
+      setEducation(loadFromStorage<Education>('portfolio_education', []));
     } finally {
       setLoading(false);
     }
@@ -118,7 +131,7 @@ export const useEducation = () => {
   }, [education]);
 
   const addEducation = async (edu: Omit<Education, 'id' | 'created_at'>) => {
-    if (!isSupabaseConfigured()) {
+    if (!isTursoConfigured()) {
       const newEdu = {
         ...edu,
         id: Math.random().toString(36).substr(2, 9),
@@ -127,19 +140,29 @@ export const useEducation = () => {
       setEducation(prev => [newEdu, ...prev]);
       return { data: newEdu, error: null };
     }
-    return await supabase.from('education').insert([edu]).select().single();
+    try {
+      const data = await tursoApi.post<Education>('/api/education', edu);
+      return { data, error: null };
+    } catch (error: unknown) {
+      return { data: null, error };
+    }
   };
 
   const updateEducation = async (id: string, updates: Partial<Education>) => {
-    if (!isSupabaseConfigured()) {
+    if (!isTursoConfigured()) {
       setEducation(prev => prev.map(e => e.id === id ? { ...e, ...updates } : e));
       return { error: null };
     }
-    return await supabase.from('education').update(updates).eq('id', id);
+    try {
+      await tursoApi.patch<Education>(`/api/education/${id}`, updates);
+      return { error: null };
+    } catch (error: unknown) {
+      return { error };
+    }
   };
 
   const deleteEducation = async (id: string) => {
-    if (!isSupabaseConfigured()) {
+    if (!isTursoConfigured()) {
       setEducation(prev => {
         const updated = prev.filter(e => e.id !== id);
         saveToStorage('portfolio_education', updated);
@@ -147,13 +170,17 @@ export const useEducation = () => {
       });
       return { error: null };
     }
-    return await supabase.from('education').delete().eq('id', id);
+    try {
+      await tursoApi.delete(`/api/education/${id}`);
+      return { error: null };
+    } catch (error: unknown) {
+      return { error };
+    }
   };
 
   return { education, loading, addEducation, updateEducation, deleteEducation, refetch: fetchEducation };
 };
 
-// Achievements Hook
 export const useAchievements = () => {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
@@ -161,16 +188,15 @@ export const useAchievements = () => {
   const fetchAchievements = useCallback(async () => {
     try {
       setLoading(true);
-      if (!isSupabaseConfigured()) {
-        setAchievements(loadFromStorage('portfolio_achievements', mockAchievements));
+      if (!isTursoConfigured()) {
+        setAchievements(loadFromStorage<Achievement>('portfolio_achievements', []));
         setLoading(false);
         return;
       }
-      const { data, error } = await supabase.from('achievements').select('*').order('date', { ascending: false });
-      if (error) throw error;
+      const data = await tursoApi.get<Achievement[]>('/api/achievements');
       setAchievements(data || []);
     } catch {
-      setAchievements(loadFromStorage('portfolio_achievements', mockAchievements));
+      setAchievements(loadFromStorage<Achievement>('portfolio_achievements', []));
     } finally {
       setLoading(false);
     }
@@ -187,7 +213,7 @@ export const useAchievements = () => {
   }, [achievements]);
 
   const addAchievement = async (achievement: Omit<Achievement, 'id' | 'created_at'>) => {
-    if (!isSupabaseConfigured()) {
+    if (!isTursoConfigured()) {
       const newAchievement = {
         ...achievement,
         id: Math.random().toString(36).substr(2, 9),
@@ -196,19 +222,29 @@ export const useAchievements = () => {
       setAchievements(prev => [newAchievement, ...prev]);
       return { data: newAchievement, error: null };
     }
-    return await supabase.from('achievements').insert([achievement]).select().single();
+    try {
+      const data = await tursoApi.post<Achievement>('/api/achievements', achievement);
+      return { data, error: null };
+    } catch (error: unknown) {
+      return { data: null, error };
+    }
   };
 
   const updateAchievement = async (id: string, updates: Partial<Achievement>) => {
-    if (!isSupabaseConfigured()) {
+    if (!isTursoConfigured()) {
       setAchievements(prev => prev.map(a => a.id === id ? { ...a, ...updates } : a));
       return { error: null };
     }
-    return await supabase.from('achievements').update(updates).eq('id', id);
+    try {
+      await tursoApi.patch<Achievement>(`/api/achievements/${id}`, updates);
+      return { error: null };
+    } catch (error: unknown) {
+      return { error };
+    }
   };
 
   const deleteAchievement = async (id: string) => {
-    if (!isSupabaseConfigured()) {
+    if (!isTursoConfigured()) {
       setAchievements(prev => {
         const updated = prev.filter(a => a.id !== id);
         saveToStorage('portfolio_achievements', updated);
@@ -216,13 +252,17 @@ export const useAchievements = () => {
       });
       return { error: null };
     }
-    return await supabase.from('achievements').delete().eq('id', id);
+    try {
+      await tursoApi.delete(`/api/achievements/${id}`);
+      return { error: null };
+    } catch (error: unknown) {
+      return { error };
+    }
   };
 
   return { achievements, loading, addAchievement, updateAchievement, deleteAchievement, refetch: fetchAchievements };
 };
 
-// Messages Hook
 export const useMessages = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
@@ -230,7 +270,7 @@ export const useMessages = () => {
   const sendMessage = async (message: Omit<Message, 'id' | 'created_at'>) => {
     try {
       setLoading(true);
-      if (!isSupabaseConfigured()) {
+      if (!isTursoConfigured()) {
         const newMessage = {
           ...message,
           id: Math.random().toString(36).substr(2, 9),
@@ -241,8 +281,9 @@ export const useMessages = () => {
         saveToStorage('portfolio_messages', updated);
         return { success: true, error: null };
       }
-      return await supabase.from('messages').insert([message]).select().single();
-    } catch (err) {
+      const data = await tursoApi.post<Message>('/api/messages', message);
+      return { success: true, data, error: null };
+    } catch (err: unknown) {
       return { success: false, error: err };
     } finally {
       setLoading(false);
@@ -250,16 +291,20 @@ export const useMessages = () => {
   };
 
   const fetchMessages = useCallback(async () => {
-    if (!isSupabaseConfigured()) {
-      setMessages(loadFromStorage('portfolio_messages', []));
+    if (!isTursoConfigured()) {
+      setMessages(loadFromStorage<Message>('portfolio_messages', []));
       return;
     }
-    const { data, error } = await supabase.from('messages').select('*').order('created_at', { ascending: false });
-    if (!error) setMessages(data || []);
+    try {
+      const data = await tursoApi.get<Message[]>('/api/messages');
+      setMessages(data || []);
+    } catch {
+      setMessages(loadFromStorage<Message>('portfolio_messages', []));
+    }
   }, []);
 
   const deleteMessage = async (id: string) => {
-    if (!isSupabaseConfigured()) {
+    if (!isTursoConfigured()) {
       setMessages(prev => {
         const updated = prev.filter(m => m.id !== id);
         saveToStorage('portfolio_messages', updated);
@@ -267,95 +312,62 @@ export const useMessages = () => {
       });
       return { error: null };
     }
-    const { error } = await supabase.from('messages').delete().eq('id', id);
-    if (!error) {
+    try {
+      await tursoApi.delete(`/api/messages/${id}`);
       setMessages(prev => prev.filter(m => m.id !== id));
+      return { error: null };
+    } catch (error: unknown) {
+      return { error };
     }
-    return { error };
   };
 
   return { messages, loading, sendMessage, fetchMessages, deleteMessage };
 };
 
-// Auth Hook
+function readStoredUser(): unknown {
+  try {
+    const storedUser = localStorage.getItem('portfolio_admin_user');
+    return storedUser ? JSON.parse(storedUser) : null;
+  } catch {
+    return null;
+  }
+}
+
 export const useAuth = () => {
-  const [user, setUser] = useState<unknown>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      // Allow mock login for dev without Supabase? No, user wants production safety.
-      // But we can check localStorage for mock user if we really wanted.
-      // For now, let's assume Supabase IS configured or we fail.
-      const storedUser = localStorage.getItem('portfolio_admin_user');
-      if (storedUser) setUser(JSON.parse(storedUser));
-      setLoading(false);
-      return;
-    }
-
-    // Supabase auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  const [user, setUser] = useState<unknown>(readStoredUser);
 
   const signIn = async (email: string, password: string) => {
-    if (!isSupabaseConfigured()) {
-      // Mock auth removed for security/production requirement
-      return { error: { message: 'Supabase not configured. Cannot log in securely.' } };
+    try {
+      const response = await fetch('/admin-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = (await response.json()) as { user?: unknown; error?: string };
+      if (!response.ok || data.error) {
+        return { error: { message: data.error || 'Invalid email or password.' } };
+      }
+      localStorage.setItem('portfolio_admin_user', JSON.stringify(data.user));
+      setUser(data.user);
+      return { data: data.user, error: null };
+    } catch (error: unknown) {
+      return { error: { message: error instanceof Error ? error.message : 'Failed to sign in.' } };
     }
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    return { data, error };
   };
 
   const signOut = async () => {
-    if (isSupabaseConfigured()) {
-      await supabase.auth.signOut();
-    }
     setUser(null);
     localStorage.removeItem('portfolio_admin_user');
     return { error: null };
   };
 
-  return { user, loading, signIn, signOut };
+  return { user, loading: false, signIn, signOut };
 };
 
-// ─── Personal Context (AI Brain) ────────────────────────────────────────────
-
-export interface PersonalContext {
-  id?: number;
-  name: string;
-  role: string;
-  location: string;
-  bio: string;
-  email: string;
-  phone: string;
-  linkedin: string;
-  github: string;
-  instagram: string;
-  availability: string;
-  yearsOfExperience: string;
-  skills: string;
-  interests: string;
-  languages: string;
-  extraNotes: string;
-}
-
-const DEFAULT_CONTEXT: PersonalContext = {
+const DEFAULT_CONTEXT: PersonalContextType = {
+  id: undefined,
   name: 'Mumtaz Kholafiyan Alfan',
   role: 'Full Stack Developer',
   location: 'Yogyakarta, Indonesia',
@@ -376,64 +388,63 @@ const DEFAULT_CONTEXT: PersonalContext = {
 const CONTEXT_STORAGE_KEY = 'portfolio_ai_context';
 
 export const usePersonalContext = () => {
-  const [context, setContext] = useState<PersonalContext>(() => {
+  const [context, setContext] = useState<PersonalContextType>(() => {
     try {
       const stored = localStorage.getItem(CONTEXT_STORAGE_KEY);
       if (stored) return { ...DEFAULT_CONTEXT, ...JSON.parse(stored) };
-    } catch { }
+    } catch {
+      return DEFAULT_CONTEXT;
+    }
     return DEFAULT_CONTEXT;
   });
 
-  // Fetch from Supabase on mount
   useEffect(() => {
     const fetchContext = async () => {
-      if (!isSupabaseConfigured()) return;
+      if (!isTursoConfigured()) return;
 
-      const { data, error } = await supabase
-        .from('personal_context')
-        .select('*')
-        .maybeSingle();
+      try {
+        const data = await tursoApi.get<Record<string, unknown>>('/api/personal-context');
 
-      if (!error && data) {
-        // Map snake_case from DB to camelCase for app
-        const mapped: PersonalContext = {
-          id: data.id,
-          name: data.name || '',
-          role: data.role || '',
-          location: data.location || '',
-          bio: data.bio || '',
-          email: data.email || '',
-          phone: data.phone || '',
-          linkedin: data.linkedin || '',
-          github: data.github || '',
-          instagram: data.instagram || '',
-          availability: data.availability || '',
-          yearsOfExperience: data.years_of_experience || '',
-          skills: data.skills || '',
-          interests: data.interests || '',
-          languages: data.languages || '',
-          extraNotes: data.extra_notes || ''
-        };
-        setContext(mapped);
-        localStorage.setItem(CONTEXT_STORAGE_KEY, JSON.stringify(mapped));
+        if (data) {
+          const text = (value: unknown): string => typeof value === 'string' ? value : '';
+          const mapped: PersonalContextType = {
+            id: typeof data.id === 'number' ? data.id : undefined,
+            name: text(data.name),
+            role: text(data.role),
+            location: text(data.location),
+            bio: text(data.bio),
+            email: text(data.email),
+            phone: text(data.phone),
+            linkedin: text(data.linkedin),
+            github: text(data.github),
+            instagram: text(data.instagram),
+            availability: text(data.availability),
+            yearsOfExperience: text(data.years_of_experience),
+            skills: text(data.skills),
+            interests: text(data.interests),
+            languages: text(data.languages),
+            extraNotes: text(data.extra_notes),
+          };
+          setContext(mapped);
+          localStorage.setItem(CONTEXT_STORAGE_KEY, JSON.stringify(mapped));
+        }
+      } catch {
+        return;
       }
     };
 
     fetchContext();
   }, []);
 
-  const updateContext = async (updates: Partial<PersonalContext>) => {
-    // 1. Optimistic update (local)
+  const updateContext = async (updates: Partial<PersonalContextType>) => {
     setContext(prev => {
       const next = { ...prev, ...updates };
       localStorage.setItem(CONTEXT_STORAGE_KEY, JSON.stringify(next));
       return next;
     });
 
-    // 2. Persist to Supabase
-    if (isSupabaseConfigured()) {
-      // Map back to snake_case
-      const dbPayload = {
+    if (isTursoConfigured()) {
+      const dbPayload: Record<string, string | undefined> = {
         name: updates.name,
         role: updates.role,
         location: updates.location,
@@ -448,25 +459,17 @@ export const usePersonalContext = () => {
         skills: updates.skills,
         interests: updates.interests,
         languages: updates.languages,
-        extra_notes: updates.extraNotes
+        extra_notes: updates.extraNotes,
       };
 
-      // Remove undefined keys
-      Object.keys(dbPayload).forEach(key =>
-        (dbPayload as any)[key] === undefined && delete (dbPayload as any)[key]
-      );
+      Object.keys(dbPayload).forEach(key => {
+        if (dbPayload[key] === undefined) delete dbPayload[key];
+      });
 
-      // Check if we have an ID to update, otherwise insert
-      if (context.id) {
-        await supabase.from('personal_context').update(dbPayload).eq('id', context.id);
-      } else {
-        // Try to find existing row first, or insert
-        const { data } = await supabase.from('personal_context').select('id').maybeSingle();
-        if (data) {
-          await supabase.from('personal_context').update(dbPayload).eq('id', data.id);
-        } else {
-          await supabase.from('personal_context').insert([dbPayload]);
-        }
+      try {
+        await tursoApi.post<Record<string, unknown>>('/api/personal-context', dbPayload);
+      } catch {
+        return;
       }
     }
   };
@@ -479,18 +482,15 @@ export const usePersonalContext = () => {
   return { context, updateContext, resetContext };
 };
 
-// Helper to read context without React (used by AIChatbot synchronously)
-export const getPersonalContext = (): PersonalContext => {
+export const getPersonalContext = (): PersonalContextType => {
   try {
     const stored = localStorage.getItem(CONTEXT_STORAGE_KEY);
     if (stored) return { ...DEFAULT_CONTEXT, ...JSON.parse(stored) };
-  } catch { }
+  } catch {
+    return DEFAULT_CONTEXT;
+  }
   return DEFAULT_CONTEXT;
 };
-
-// ─── Chat Sessions Hook (wraps query functions) ────────────────────────────────────
-import type { ChatSession } from '../types/database';
-import { fetchChatSessionsQuery, deleteChatSessionQuery } from './useChatQuery';
 
 export const useChatSessions = () => {
   const [sessions, setSessions] = useState<ChatSession[]>([]);

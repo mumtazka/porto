@@ -1,12 +1,11 @@
 import path from "path"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
-import { inspectAttr } from 'kimi-plugin-inspect-react'
 
 // https://vite.dev/config/
 export default defineConfig({
   base: './',
-  plugins: [inspectAttr(), react()],
+  plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -24,11 +23,19 @@ export default defineConfig({
             if (id.includes('lucide')) return 'vendor-icons';
             if (id.includes('gsap')) return 'vendor-gsap';
             if (id.includes('recharts')) return 'vendor-viz';
-            if (id.includes('supabase')) return 'vendor-supabase';
+            if (id.includes('turso')) return 'vendor-turso';
             return 'vendor'; // all other libs
           }
         },
       },
+    },
+  },
+  server: {
+    proxy: {
+      '/api': 'http://localhost:8788',
+      '/chat-luna': 'http://localhost:8788',
+      '/github-contributions': 'http://localhost:8788',
+      '/admin-login': 'http://localhost:8788',
     },
   },
   esbuild: {
